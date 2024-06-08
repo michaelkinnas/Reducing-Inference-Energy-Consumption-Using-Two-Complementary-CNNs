@@ -18,7 +18,8 @@ class CIFAR10Val(Dataset):
         if not path.exists(root):
             raise FileNotFoundError("The provided file path directory does not exist")
 
-        with open(f'{root}/cifar-10-batches-py/test_batch', 'rb') as fo:
+        # with open(f'{root}/cifar-10-batches-py/test_batch', 'rb') as fo:
+        with open(root, 'rb') as fo:
             images_dict = pload(fo, encoding='bytes')
             for img, label in zip(images_dict[b'data'], images_dict[b'labels']):
                 self.images.append((self.__CIFAR_to_numpy(img), array(label))) # shape HxWxC
