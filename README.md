@@ -1,3 +1,3 @@
-This is a collection of python and jupyter notebook scripts that experiment with various methods of reducing artificial neural network energy consumption during training and or inference.
+### This code is part of the "Reducing the Energy Requirements of Inference using two Counterpart CNNs" paper published at ----- 
 
-The main framework used for neural networks is PyTorch, plus various others like numpy, pandas etc.
+To run the example of the proposed methodoly you can run the main.py file, as explained below
