@@ -19,7 +19,6 @@ def single(model, valset, device):
     with inference_mode():
         for _, (X, y) in tqdm(enumerate(valset), total=len(valset)):
 
-            # X, y = X.unsqueeze(dim=0).to(device), tensor(y).unsqueeze(dim=0).to(device)
             X = X.unsqueeze(dim=0).to(device)
 
             monitor.record_cpu_util()
@@ -65,7 +64,6 @@ def double(model_a, model_b, valset, threshold, score_function, device):
         with inference_mode():
             for _, (X, y) in tqdm(enumerate(valset), total=len(valset)):
             
-                # X, y = X.unsqueeze(dim=0).to(device), tensor(y).unsqueeze(dim=0).to(device)
                 X = X.unsqueeze(dim=0).to(device)
 
                 monitor.record_cpu_util()
@@ -93,7 +91,6 @@ def double(model_a, model_b, valset, threshold, score_function, device):
         with inference_mode():
             for _, (X, y) in tqdm(enumerate(valset), total=len(valset)):
             
-                # X, y = X.unsqueeze(dim=0).to(device), tensor(y).unsqueeze(dim=0).to(device)
                 X = X.unsqueeze(dim=0).to(device)
 
                 monitor.record_cpu_util()
@@ -141,7 +138,7 @@ def double_ps(model_a, model_b, valset, threshold, score_function, device):
     if not score_function == 'entropy':
         with inference_mode():
             for _, (X, y) in tqdm(enumerate(valset), total=len(valset)):
-                # X, y = X.unsqueeze(dim=0).to(device), tensor(y).unsqueeze(dim=0).to(device)
+
                 X = X.unsqueeze(dim=0).to(device)
 
                 monitor.record_cpu_util()
@@ -236,7 +233,7 @@ def double_ps_mem(model_a, model_b, valset, threshold, score_function, device, m
     if not score_function == 'entropy':
         with inference_mode():
             for _, (X, y, z) in tqdm(enumerate(valset), total=len(valset)):
-                # X, y = X.unsqueeze(dim=0).to(device), tensor(y).unsqueeze(dim=0).to(device)
+
                 X = X.unsqueeze(dim=0).to(device)
 
                 monitor.record_cpu_util()
@@ -277,8 +274,8 @@ def double_ps_mem(model_a, model_b, valset, threshold, score_function, device, m
                 correct += pred_label == y.item()
     else:
         with inference_mode():
-            for _, (X, y) in tqdm(enumerate(valset), total=len(valset)):
-                # X, y = X.unsqueeze(dim=0).to(device), tensor(y).unsqueeze(dim=0).to(device)
+            for _, (X, y, z) in tqdm(enumerate(valset), total=len(valset)):
+
                 X = X.unsqueeze(dim=0).to(device)
 
                 monitor.record_cpu_util()
@@ -333,7 +330,7 @@ def double_oracle(model_a, model_b, valset, device):
 
     with inference_mode():
         for _, (X, y) in tqdm(enumerate(valset), total=len(valset)):
-            # X, y = X.unsqueeze(dim=0).to(device), tensor(y).unsqueeze(dim=0).to(device)
+
             X = X.unsqueeze(dim=0).to(device)
 
             monitor.record_cpu_util()

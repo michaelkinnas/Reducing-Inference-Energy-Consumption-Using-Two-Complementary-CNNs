@@ -8,8 +8,8 @@ from os import walk, path
 from PIL import Image
 
 
-class CIFAR10Val(Dataset):
-    def __init__(self, root: str, transform: Optional[Callable]=None, return_numpy=False, duplicate_ratio=0.0, transform_prob=0.0, random_seed=None):
+class CIFAR10C(Dataset):
+    def __init__(self, root: str, transform: Optional[Callable]=None, train=False, return_numpy=False, duplicate_ratio=0.0, transform_prob=0.0, random_seed=None):
         self.images = []        
         self.transform = transform
         self.return_numpy = return_numpy
@@ -17,13 +17,23 @@ class CIFAR10Val(Dataset):
 
         if not path.exists(root):
             raise FileNotFoundError("The provided file path directory does not exist")
+        
 
-        # with open(f'{root}/cifar-10-batches-py/test_batch', 'rb') as fo:
-        with open(root, 'rb') as fo:
-            images_dict = pload(fo, encoding='bytes')
-            for img, label in zip(images_dict[b'data'], images_dict[b'labels']):
-                self.images.append((self.__CIFAR_to_numpy(img), array(label))) # shape HxWxC
-                # self.labels.append(label)
+        if train:
+            batches = ("data_batch_1",
+                        "data_batch_2",
+                        "data_batch_3",
+                        "data_batch_4",
+                        "data_batch_5")
+        else:
+            batches = ["test_batch"]
+
+        for batch in batches:
+            with open(root+"/"+batch, 'rb') as fo:
+                images_dict = pload(fo, encoding='bytes')
+                for img, label in zip(images_dict[b'data'], images_dict[b'labels']):
+                    self.images.append((self.__CIFAR_to_numpy(img), array(label))) # shape HxWxC
+
 
         if duplicate_ratio != 0:
             if duplicate_ratio < 0:
@@ -55,20 +65,6 @@ class CIFAR10Val(Dataset):
             # shuffle images
             self.random.shuffle(self.images)
 
-        #make random rotations and flips
-        # if transform_prob != 0:
-        #     if transform_prob < 0 or transform_prob > 1:
-        #         raise ValueError("Transform probability must be in the range (0, 1]")
-                 
-        #     for i, (image, label) in enumerate(self.images):
-        #         if self.random.random() <= transform_prob:
-        #             image = self.random.choice([rotate(image, ROTATE_90_COUNTERCLOCKWISE), 
-        #                                         rotate(image, ROTATE_90_CLOCKWISE), 
-        #                                         rotate(image, ROTATE_180),
-        #                                         flip(image, 0)])
-                    
-        #             self.images[i] = (image, label)
-    
     
     def __CIFAR_to_numpy(self, bin_data):
         r = array(bin_data[0:1024]).reshape((32, 32))
@@ -94,7 +90,7 @@ class CIFAR10Val(Dataset):
 
 
 # Use subset
-class ImageNetVal(Dataset):
+class ImageNetC(Dataset):
     def __init__(self, root: str, transform: Optional[Callable]=None, return_numpy=False, duplicate_ratio=0.0, transform_prob=0.0, random_seed=None):
         self.images = []        
         self.transform = transform

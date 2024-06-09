@@ -2,8 +2,8 @@
 Main inference workload script
 v1.3.1
 '''
-from sys import path
-path.append('../')
+# from sys import path
+# path.append('../')
 
 from argparse import ArgumentParser 
 from torch import cuda
@@ -18,7 +18,7 @@ def main():
 
     parser.add_argument("-m1", "--model1", help="The first model, required. This parameter will set which dataset to use (CIFAR10 or ImageNet)", required=True)   
     parser.add_argument("-m2", "--model2", help="The second model.", default=None, required=False)
-    parser.add_argument("-i", "--filepath", help="The path of the correspondig CIFAR-10 or ImageNet validation or test dataset.", required=True)
+    parser.add_argument("-i", "--filepath", help="The path of the corresponding CIFAR-10 or ImageNet validation or test dataset.", required=True)
     parser.add_argument("-s", "--scorefn", help="Score function to use.", choices=['maxp', 'difference', 'entropy', 'oracle'], default=None, required=False)
     parser.add_argument("-t", "--threshold", help="The threshold value to use for the threshold check.", type=float, required=False)
     parser.add_argument("-p", "--postcheck", help="Enable post check. Default is false.", default=False, action="store_true")
@@ -37,7 +37,7 @@ def main():
 
     if args.model1 in cifar10_models:
         from torch import hub
-        from utils.datasets import CIFAR10Val
+        from utils.datasets import CIFAR10C
         from torchvision.transforms import Compose, ToTensor, Normalize
 
         transform = Compose([
@@ -48,9 +48,9 @@ def main():
         print("Loading dataset...")
 
         if args.memory:
-            valset = CIFAR10Val(root=args.filepath, transform=transform, return_numpy=True, duplicate_ratio=args.duplicates, transform_prob=args.rotations, random_seed=42)
+            valset = CIFAR10C(root=args.filepath, train=False, return_numpy=True, transform=transform, duplicate_ratio=args.duplicates, transform_prob=args.rotations, random_seed=42)
         else:
-            valset = CIFAR10Val(root=args.filepath, transform=transform, return_numpy=False, duplicate_ratio=args.duplicates, transform_prob=args.rotations, random_seed=42)
+            valset = CIFAR10C(root=args.filepath, train=False, return_numpy=False, transform=transform, duplicate_ratio=args.duplicates, transform_prob=args.rotations, random_seed=42)
 
         print("Loading models...")
         model_a = hub.load("chenyaofo/pytorch-cifar-models", model=f'cifar10_{args.model1}', pretrained=True).to(device)

@@ -1,28 +1,21 @@
-from sys import path
-path.append('../../')
-
 import pandas as pd
 import numpy as np
-
 from torch.utils import data
-
 from utils.score_fns import max_probability, difference, entropy
-from utils.datasets import ImageNetVal, CIFAR10Val
+from utils.datasets import ImageNetC, CIFAR10C
 from utils.models_lists import imagenet_models, cifar10_models
 from utils.heuristics import heuristic_search
-
 from torch import cuda, hub, inference_mode, argmax, tensor
 from torchvision.transforms import Compose, ToTensor, Normalize
 from tqdm.auto import tqdm
-
 from torchvision.models import get_model
 from threading import Thread
-
 from argparse import ArgumentParser 
 
 '''
-This script will run the hypermarameter search on the validation test and then run 
-the proposed methodology with all parameters on the test set.
+This script will run the hypermarameter search on the provided validation dataset
+and then calculate the optimal threshold hyperparamter for each combination of 
+score functions with and without the post-check mechanism, for max accuracy.
 '''
 def main():
     parser = ArgumentParser()
@@ -30,6 +23,7 @@ def main():
     parser.add_argument("-m1", "--model1", help="The first model, required. This parameter will set which dataset to use (CIFAR10 or ImageNet)", required=True)   
     parser.add_argument("-m2", "--model2", help="The second model, required. ", required=True)    
     parser.add_argument("-v", "--valset", help="The path of the correspondig CIFAR-10 or ImageNet validation dataset.", required=True)
+    parser.add_argument("-t", "--train", help="Only valid for the CIFAR-10 dataset. Define wether to use the training or test dataset.", default=False, action="store_true")
     parser.add_argument("-n", "--n_threshold_values", help="Define the number of threshold values to check between 0 and 1. Higher numbers will be slower. Default is 2000", type=int, default=2000)
     
     args = parser.parse_args()
@@ -57,7 +51,10 @@ def main():
         model_a.eval()
         model_b.eval()
 
-        dataset = CIFAR10Val(root=args.valset, transform=transform, random_seed=42)
+        # if args.train:
+        dataset = CIFAR10C(root=args.valset, train=args.train, transform=transform, random_seed=42)
+        # else:
+        #     dataset = CIFAR10C(root=args.valset, train=False, transform=transform, random_seed=42)
         
         BATCH_SIZE=64
 
@@ -81,7 +78,7 @@ def main():
         model_a.eval()
         model_b.eval()
 
-        dataset = ImageNetVal(root=args.valset, transform=transform, random_seed=42)
+        dataset = ImageNetC(root=args.valset, transform=transform, random_seed=42)
 
         BATCH_SIZE=64
 
@@ -156,12 +153,12 @@ def main():
     df_entropy_ps = pd.DataFrame(results['entropy_acc_ps']).iloc[::-1].reset_index(drop=True) # Reverse order for entropy
 
     print(f"Found best threshold hyperparameters for {args.model1}, {args.model2}")
-    print(f"Score function: Max Probability, Threshold: {df_max_p.iloc[df_max_p['accuracy'].idxmax()].iat[0]:.4f}, with achieved accuracy of {df_max_p.iloc[df_max_p['accuracy'].idxmax()].iat[1] / len(dataset):.2f}%")
-    print(f"Score function: Difference, Threshold: {df_diff.iloc[df_diff['accuracy'].idxmax()].iat[0]:.4f}, with achieved accuracy {df_diff.iloc[df_diff['accuracy'].idxmax()].iat[1] / len(dataset):.2f}%")
-    print(f"Score function: Entropy, Threshold: {df_entropy.iloc[df_entropy['accuracy'].idxmax()].iat[0]:.4f}, with achieved accuracy {df_entropy.iloc[df_entropy['accuracy'].idxmax()].iat[1] / len(dataset):.2f}%")
-    print(f"Score function: Max Probability, Threshold: {df_max_p_ps.iloc[df_max_p_ps['accuracy'].idxmax()].iat[0]:.4f} with postcheck, with achieved accuracy {df_max_p_ps.iloc[df_max_p_ps['accuracy'].idxmax()].iat[1] / len(dataset):.2f}%")
-    print(f"Score function: Difference, Threshold: {df_diff_ps.iloc[df_diff_ps['accuracy'].idxmax()].iat[0]:.4f} with postcheck, with achieved accuracy {df_diff_ps.iloc[df_diff_ps['accuracy'].idxmax()].iat[1] / len(dataset):.2f}%")
-    print(f"Score function: Entropy, Threshold: {df_entropy_ps.iloc[df_entropy_ps['accuracy'].idxmax()].iat[0]:.4f} with postcheck, with achieved accuracy {df_entropy_ps.iloc[df_entropy_ps['accuracy'].idxmax()].iat[1] / len(dataset):.2f}%")
+    print(f"Score function: Max Probability, Threshold: {df_max_p.iloc[df_max_p['accuracy'].idxmax()].iat[0]:.4f}, with achieved accuracy of {df_max_p.iloc[df_max_p['accuracy'].idxmax()].iat[1] / len(dataset) * 100:.2f}%")
+    print(f"Score function: Difference, Threshold: {df_diff.iloc[df_diff['accuracy'].idxmax()].iat[0]:.4f}, with achieved accuracy of {df_diff.iloc[df_diff['accuracy'].idxmax()].iat[1] / len(dataset)* 100:.2f}%")
+    print(f"Score function: Entropy, Threshold: {df_entropy.iloc[df_entropy['accuracy'].idxmax()].iat[0]:.4f}, with achieved accuracy of {df_entropy.iloc[df_entropy['accuracy'].idxmax()].iat[1] / len(dataset)* 100:.2f}%")
+    print(f"Score function: Max Probability, Threshold: {df_max_p_ps.iloc[df_max_p_ps['accuracy'].idxmax()].iat[0]:.4f}, with postcheck, with achieved accuracy of {df_max_p_ps.iloc[df_max_p_ps['accuracy'].idxmax()].iat[1] / len(dataset)* 100:.2f}%")
+    print(f"Score function: Difference, Threshold: {df_diff_ps.iloc[df_diff_ps['accuracy'].idxmax()].iat[0]:.4f}, with postcheck, with achieved accuracy of {df_diff_ps.iloc[df_diff_ps['accuracy'].idxmax()].iat[1] / len(dataset)* 100:.2f}%")
+    print(f"Score function: Entropy, Threshold: {df_entropy_ps.iloc[df_entropy_ps['accuracy'].idxmax()].iat[0]:.4f}, with postcheck, with achieved accuracy of {df_entropy_ps.iloc[df_entropy_ps['accuracy'].idxmax()].iat[1] / len(dataset)* 100:.2f}%")
 
 
 if __name__ == '__main__':
