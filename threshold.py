@@ -29,7 +29,8 @@ def main():
     args = parser.parse_args()
 
     device = 'cuda' if cuda.is_available() else 'cpu'
-    cuda.empty_cache()   
+    if device == 'cuda':
+        cuda.empty_cache()    
 
     # Setup parameters
     if args.model1 in cifar10_models:

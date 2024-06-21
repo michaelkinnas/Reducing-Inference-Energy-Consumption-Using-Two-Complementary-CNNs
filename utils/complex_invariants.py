@@ -5,6 +5,10 @@ from scipy.special import comb
 from math import modf
 
 
+
+
+
+
 # Needs single channel image (grayscale) 
 def __calculateMoments(data_matrix, order):
     """
@@ -60,7 +64,7 @@ def __geometricMomentsToComplexMoments(gm, order):
     return c
 
 
-def __calculate_complex_invariants(image):
+def calculate_complex_invariants(image):
     """
     It calculates the invariants.
     
@@ -122,11 +126,11 @@ def __calculate_complex_invariants(image):
 
 
 def complex_invariants_hash_string(image):
-    invariants = __calculate_complex_invariants(image)
+    invariants = calculate_complex_invariants(image)
     x, _ = modf(invariants[0])
     return f"{x:.24f}"[2:]
 
 
 def complex_invariants_hash_addition_float(image):
-    invariants = __calculate_complex_invariants(image)
+    invariants = calculate_complex_invariants(image)
     return invariants[0] + invariants[1] + invariants[3] + invariants[4]

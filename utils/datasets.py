@@ -26,7 +26,8 @@ class CIFAR10C(Dataset):
                         "data_batch_4",
                         "data_batch_5")
         else:
-            batches = ["test_batch"]
+            # batches = ["test_batch"]
+            batches = ("test_batch",)
 
         for batch in batches:
             with open(root+"/"+batch, 'rb') as fo:

@@ -63,7 +63,7 @@ def main():
             model_b.eval()
     else:
         from torchvision.models import get_model
-        from utils.datasets import ImageNetVal
+        from utils.datasets import ImageNetC
         from torchvision.transforms import Compose, ToTensor, Normalize
         from utils.models_lists import imagenet_models
 
@@ -73,9 +73,9 @@ def main():
         ])
         print("Loading dataset...")
         if args.memory:
-            valset = ImageNetVal(root=args.filepath, transform=transform, return_numpy=True, duplicate_ratio=args.duplicates, transform_prob=args.rotations, random_seed=42)
+            valset = ImageNetC(root=args.filepath, transform=transform, return_numpy=True, duplicate_ratio=args.duplicates, transform_prob=args.rotations, random_seed=42)
         else:
-            valset = ImageNetVal(root=args.filepath, transform=transform, return_numpy=False, duplicate_ratio=args.duplicates, transform_prob=args.rotations, random_seed=42)
+            valset = ImageNetC(root=args.filepath, transform=transform, return_numpy=False, duplicate_ratio=args.duplicates, transform_prob=args.rotations, random_seed=42)
 
         print("Loading models...")
         model_a = get_model(args.model1, weights=imagenet_models[args.model1]).to(device)
@@ -129,7 +129,8 @@ def main():
                     from utils.workload_fns import double_ps_mem
                     response_times, correct = double_ps_mem(model_a=model_a, model_b=model_b, valset=valset, threshold=args.threshold, score_function=args.scorefn, memory=args.memory, device=device)
         
-    write_results(args, response_times=response_times, correct=correct)
+    # write_results(args, response_times=response_times, correct=correct)
+    print(f"Accuracy: {correct/len(valset) * 100:.2f}")
 
     if args.finish == 'shutdown':
 
