@@ -18,14 +18,14 @@ def main():
 
     parser.add_argument("-m1", "--model1", help="The first model, required. This parameter will set which dataset to use (CIFAR10 or ImageNet)", required=True)   
     parser.add_argument("-m2", "--model2", help="The second model.", default=None, required=False)
-    parser.add_argument("-i", "--filepath", help="The path of the corresponding CIFAR-10 or ImageNet validation or test dataset.", required=True)
+    parser.add_argument("-f", "--filepath", help="The path of the corresponding CIFAR-10 or ImageNet validation or test dataset.", required=True)
     parser.add_argument("-s", "--scorefn", help="Score function to use.", choices=['maxp', 'difference', 'entropy', 'oracle'], default=None, required=False)
     parser.add_argument("-t", "--threshold", help="The threshold value to use for the threshold check.", type=float, required=False)
     parser.add_argument("-p", "--postcheck", help="Enable post check. Default is false.", default=False, action="store_true")
     parser.add_argument("-m", "--memory", help="Enable memory component. Default is None.", choices=['dhash', 'invariants'], default=None)
     parser.add_argument("-d", "--duplicates", help="Set the percentage of the original training set for duplication. Default is 0 (No duplicates). Range (0-1]", type=float, default=0)
     parser.add_argument("-r", "--rotations", help="Set the percentage of the duplicated samples to apply random rotations or flips if a --duplicates value is given. Default is 0. Range (0-1]", type=float, default=0)
-    parser.add_argument("-f", "--finish", help="What to do when finished. Default is shutdown.", choices=['shutdown', 'alarm'], default="shutdown")
+    parser.add_argument("-e", "--end", help="What to do when finished. Default is shutdown.", choices=['shutdown', 'alarm'], default="shutdown")
 
     args = parser.parse_args()
 
@@ -129,13 +129,13 @@ def main():
                     from utils.workload_fns import double_ps_mem
                     response_times, correct = double_ps_mem(model_a=model_a, model_b=model_b, valset=valset, threshold=args.threshold, score_function=args.scorefn, memory=args.memory, device=device)
         
-    # write_results(args, response_times=response_times, correct=correct)
+    write_results(args, response_times=response_times, correct=correct)
     print(f"Accuracy: {correct/len(valset) * 100:.2f}")
 
-    if args.finish == 'shutdown':
+    if args.end == 'shutdown':
 
         system('sudo shutdown now')
-    elif args.finish == 'alarm':
+    elif args.end == 'alarm':
         playsound('./alarm.wav')
 
 

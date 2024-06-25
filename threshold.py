@@ -22,7 +22,7 @@ def main():
 
     parser.add_argument("-m1", "--model1", help="The first model, required. This parameter will set which dataset to use (CIFAR10 or ImageNet)", required=True)   
     parser.add_argument("-m2", "--model2", help="The second model, required. ", required=True)    
-    parser.add_argument("-v", "--valset", help="The path of the correspondig CIFAR-10 or ImageNet validation dataset.", required=True)
+    parser.add_argument("-f", "--filepath", help="The path of the correspondig CIFAR-10 or ImageNet validation dataset.", required=True)
     parser.add_argument("-t", "--train", help="Only valid for the CIFAR-10 dataset. Define wether to use the training or test dataset.", default=False, action="store_true")
     parser.add_argument("-n", "--n_threshold_values", help="Define the number of threshold values to check between 0 and 1. Higher numbers will be slower. Default is 2000", type=int, default=2000)
     
@@ -52,11 +52,8 @@ def main():
         model_a.eval()
         model_b.eval()
 
-        # if args.train:
-        dataset = CIFAR10C(root=args.valset, train=args.train, transform=transform, random_seed=42)
-        # else:
-        #     dataset = CIFAR10C(root=args.valset, train=False, transform=transform, random_seed=42)
-        
+        dataset = CIFAR10C(root=args.filepath, train=args.train, transform=transform, random_seed=42)
+
         BATCH_SIZE=64
 
         dataloader = data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)        
@@ -79,7 +76,7 @@ def main():
         model_a.eval()
         model_b.eval()
 
-        dataset = ImageNetC(root=args.valset, transform=transform, random_seed=42)
+        dataset = ImageNetC(root=args.filepath, transform=transform, random_seed=42)
 
         BATCH_SIZE=64
 
@@ -92,8 +89,6 @@ def main():
     report = []
     with inference_mode():
         for X, y in tqdm(dataloader, desc="Running inference"):
-
-            # X, y = X.to(device), y.to(device)
             X = X.to(device)
 
             preds_a = model_a(X)

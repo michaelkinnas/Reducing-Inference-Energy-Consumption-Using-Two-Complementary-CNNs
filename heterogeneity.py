@@ -11,9 +11,9 @@ from tqdm.auto import tqdm
 def main():
     parser = ArgumentParser()
 
-    parser.add_argument("-d", "--dataset", help="Define which dataset to use", choices=['cifar10', 'imagenet'], default='cifar-10', required=True)
-    parser.add_argument("-v", "--valset", help="The path of the correspondig CIFAR-10 or ImageNet validation dataset.", required=True)
-    parser.add_argument("-t", "--train", help="Only valid for the CIFAR-10 dataset. Define wether to use the training or test dataset.", default=False, action="store_true")
+    parser.add_argument("-d", "--dataset", help="Define which dataset models to use.", choices=['cifar10', 'imagenet'], default='cifar-10', required=True)
+    parser.add_argument("-f", "--filepath", help="The path of the correspondig CIFAR-10 or ImageNet validation dataset.", required=True)
+    parser.add_argument("-t", "--train", help="Only applicable to the CIFAR-10 dataset. Define whether to use the training or test dataset.", default=False, action="store_true")
     
     args = parser.parse_args()
 
@@ -31,7 +31,7 @@ def main():
 
         model_list = cifar10_models
 
-        dataset = CIFAR10C(root=args.valset, train=args.train, transform=transform, random_seed=42)
+        dataset = CIFAR10C(root=args.filepath, train=args.train, transform=transform, random_seed=42)
         
         BATCH_SIZE=64
 
@@ -45,7 +45,7 @@ def main():
 
         model_list = imagenet_models
 
-        dataset = ImageNetC(root=args.valset, transform=transform, random_seed=42)
+        dataset = ImageNetC(root=args.filepath, transform=transform, random_seed=42)
 
         BATCH_SIZE=64
 
@@ -53,7 +53,7 @@ def main():
 
     all_results = {}
 
-    for model_name in model_list[:2]:
+    for model_name in model_list:
         predictions = []
         truth = []
 
@@ -94,7 +94,6 @@ def main():
             volume = 0
             for i, j, k in zip(df[model1], df[model2], df['true']):
                 volume += (i == k or j == k) and i != j
-                # volume += (i == k or j == k)
             heterogeneity_matrix.at[model1, model2] = volume / len(df)
 
     print("Saving results ...")
