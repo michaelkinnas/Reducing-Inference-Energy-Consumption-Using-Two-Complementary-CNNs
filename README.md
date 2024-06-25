@@ -1,6 +1,6 @@
 # Reducing the Energy Requirements of Inference using two Counterpart CNNs
 
-This repository is part of the "Reducing the Energy Requirements of Inference using two Counterpart CNNs" paper published at ----- 
+This repository is part of my thesis "Reducing the energy requirements of Artificial Νeural Νetworks in Training & Inference", for Harokopio University of Athens.
 
 It contains three main scripts that run the experiments as described in the paper.
 
@@ -11,18 +11,21 @@ To run it you can type `python3 main.py` plus additional parameters as described
 
 - -m1 --model1: The first CNN model to use. The selection of the first model will determine which dataset to use, CIFAR-10 or ImageNet
 - -m2 --model2: The second CNN model to use. Optional. If not set the script will simply run a single model inference workload of the first model.
-- -i --filepath: The directory path of the CIFAR-10 or ImageNet dataset.
+- -f --filepath: The directory path of the CIFAR-10 or ImageNet dataset.
 - -s --scorefn: The selected of the four score functions to use. Options: (maxp, difference, entropy, oracle).
-- -p --postcheck: A set option to use the postcheck mechanism or not.
-- -m --memory: If set with one of the options the memory component is enabled. Options: (dhash, invariants).
-- -d --duplicates: If set to a value greater than 0 then the ratio of duplicated samples will be used. You can choose a value greater than 1.
-- -r --rotations: If set to a value greater than 0 then the ratio of random rotations and mirroring on the duplicated samples.
-- -f --finish: What to do when finished. Default is shutdown the system after writing the report on a csv file.
+- -p --postcheck: Enable post-check. Default is false.
+- -m --memory: Enable memory component. Default is None. Options: (dhash, invariants).
+- -d --duplicates: Set the percentage of the original training set for duplication. Default is 0 (No duplicates). Range (0-1].
+- -r --rotations: Set the percentage of the duplicated samples to apply random rotations or flips if a --duplicates value is given. Default is 0. Range (0-1].
+- -e --end: What to do when finished. Options: {alarm, shutdown}. Default is shutdown.
 
+### Examples of use
 
+```console
+python3 main.py --model1 resnet20 --model2 mobilenetv2_x0_5 --filepath "../data/cifar-10-batches-py" --scorefn difference --threshold 0.8724 --postcheck --end alarm
+```
 
-
-### Find best hyperparameter for max accuracy.
+## Find best hyperparameter for max accuracy.
 
 The script file `threshold.py` will calculate the optimal threshold hyperparameter for a given CNN pair. 
 
@@ -30,13 +33,35 @@ To run it use the command `python3 threshold.py` plus some additional parameters
 
 - -m1 --model1: The first CNN model to use.
 - -m2 --model2: The second CNN model to use.
-- -v --valset: The directory path of the CIFAR-10 or ImageNet dataset to use.
+- -f --filepath: The directory path of the CIFAR-10 or ImageNet dataset to use.
 - -t --train: Only applicable for the CIFAR-10 dataset. Wether to use the training or test dataset.
 - -n --n_threshold_values: The number of threshold values between 0 and 1 to check. The greater the number the longer the process. Default is 2000.
 
-## Examples of use
+### Examples of use
 
+To calculate the best threshold hyperparameter for the selected CNN pair, you can type:
 
+```console
+python3 threshold.py --model1 resnet20 --model2 mobilenetv2_x0_5 --filepath "../data/cifar-10-batches-py"
+```
+
+_Notice: Normally you would use a validation set for this. However CIFAR-10 does not have a validation set, thus running this script on the test set, will calculate the perfect hypermarameter for best accuracy. In our paper we used the training set although not 100% correct._
+
+## Calculate heterogeneity matrix.
+
+The script file `heterogeneity.py` will calculate the optimal threshold hyperparameter for a given CNN pair. 
+
+To run it use the command `python3 heterogeneity.py` plus some additional parameters as described bellow:
+
+- -d --dataset: The directory path of the CIFAR-10 or ImageNet dataset to use.
+- -f --filepath: The directory path of the CIFAR-10 or ImageNet dataset to use.
+- -t --train: Only applicable to the CIFAR-10 dataset. Define whether to use the training or test dataset.
+
+### Examples of use
+```console
+python3 heterogeneity.py -d cifar10 -f "../data/cifar-10-batches-py"
+```
+_Notice: Normally you would use a validation set for this. However CIFAR-10 does not have a validation set, thus running this script on the test set, will calculate the perfect hypermarameter for best accuracy. In our paper we used the training set although not 100% correct._
 
 ## Supported CNN models
 
