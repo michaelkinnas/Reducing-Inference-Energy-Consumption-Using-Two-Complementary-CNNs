@@ -53,7 +53,7 @@ The script file `heterogeneity.py` will calculate the optimal threshold hyperpar
 
 To run it use the command `python3 heterogeneity.py` plus some additional parameters as described bellow:
 
-- -d --dataset: The directory path of the CIFAR-10 or ImageNet dataset to use.
+- -d --dataset: Which dataset models to use. Options: {cifar10, imagenet}.
 - -f --filepath: The directory path of the CIFAR-10 or ImageNet dataset to use.
 - -t --train: Only applicable to the CIFAR-10 dataset. Define whether to use the training or test dataset.
 
