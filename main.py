@@ -2,9 +2,6 @@
 Main inference workload script
 v1.3.1
 '''
-# from sys import path
-# path.append('../')
-
 from argparse import ArgumentParser 
 from torch import cuda
 from os import system
