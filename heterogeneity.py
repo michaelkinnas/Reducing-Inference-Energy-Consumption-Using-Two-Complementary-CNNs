@@ -7,6 +7,7 @@ from torchvision.transforms import Compose, ToTensor, Normalize
 from torchvision.models import get_model
 from argparse import ArgumentParser
 from tqdm.auto import tqdm
+from utils.plotter import plot_heterogeneity_matrix
 
 def main():
     parser = ArgumentParser()
@@ -97,7 +98,7 @@ def main():
             heterogeneity_matrix.at[model1, model2] = volume / len(df)
 
     print("Saving results ...")
-    heterogeneity_matrix.to_csv('./heterogeneity_results.csv', index=False)
+    plot_heterogeneity_matrix(heterogeneity_matrix)
 
 if __name__ == '__main__':
     main()
