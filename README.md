@@ -1,4 +1,4 @@
-# Reducing the Energy Requirements of Inference using two Counterpart CNNs
+# Reducing the energy requirements of Artificial Νeural Νetworks in Training & Inference
 
 This repository is part of my thesis "Reducing the energy requirements of Artificial Νeural Νetworks in Training & Inference", for Harokopio University of Athens.
 
