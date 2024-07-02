@@ -27,7 +27,7 @@ To run it you can type `python3 main.py` plus additional parameters as described
 python3 main.py --model1 resnet20 --model2 mobilenetv2_x0_5 --filepath "../data/cifar-10-batches-py" --scorefn difference --threshold 0.8724 --postcheck --end alarm
 ```
 
-## Find best hyperparameter for max accuracy.
+## Search for threshold hyperparameter that achieves max accuracy.
 
 The script file `threshold.py` will calculate the optimal threshold hyperparameter for a given CNN pair. 
 
@@ -49,8 +49,6 @@ To calculate the best threshold hyperparameter for the selected CNN pair, you ca
 python3 threshold.py --model1 resnet20 --model2 mobilenetv2_x0_5 --filepath "../data/cifar-10-batches-py"
 ```
 
-_Notice: Normally you would use a validation set for this. However CIFAR-10 does not have a validation set, thus running this script on the test set, will calculate the perfect hypermarameter for best accuracy. In our paper we used the training set although not 100% correct._
-
 ## Calculate heterogeneity matrix.
 
 The script file `heterogeneity.py` will calculate the optimal threshold hyperparameter for a given CNN pair. 
@@ -67,7 +65,6 @@ To run it use the command `python3 heterogeneity.py` plus some additional parame
 ```console
 python3 heterogeneity.py -d cifar10 -f "../data/cifar-10-batches-py"
 ```
-_Notice: Normally you would use a validation set for this. However CIFAR-10 does not have a validation set, thus running this script on the test set, will calculate the perfect hypermarameter for best accuracy. In our paper we used the training set although not 100% correct._
 
 ## Supported CNN models
 
