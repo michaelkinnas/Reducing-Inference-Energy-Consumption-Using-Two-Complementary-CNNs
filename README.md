@@ -9,15 +9,17 @@ It contains three main scripts that run the experiments as described in the pape
 The file `main.py` will run the main inference workload of the proposed methodology.
 To run it you can type `python3 main.py` plus additional parameters as described bellow. A list of supported CNN models is written below.
 
-- -m1 --model1: The first CNN model to use. The selection of the first model will determine which dataset to use, CIFAR-10 or ImageNet
-- -m2 --model2: The second CNN model to use. Optional. If not set the script will simply run a single model inference workload of the first model.
-- -f --filepath: The directory path of the CIFAR-10 or ImageNet dataset.
-- -s --scorefn: The selected of the four score functions to use. Options: (maxp, difference, entropy, oracle).
-- -p --postcheck: Enable post-check. Default is false.
-- -m --memory: Enable memory component. Default is None. Options: (dhash, invariants).
-- -d --duplicates: Set the percentage of the original training set for duplication. Default is 0 (No duplicates). Range (0-1].
-- -r --rotations: Set the percentage of the duplicated samples to apply random rotations or flips if a --duplicates value is given. Default is 0. Range (0-1].
-- -e --end: What to do when finished. Options: {alarm, shutdown}. Default is shutdown.
+```
+- -m1 --model1:        The first CNN model to use. The selection of the first model will determine which dataset to use, CIFAR-10 or ImageNet
+- -m2 --model2:        The second CNN model to use. Optional. If not set the script will simply run a single model inference workload of the first model.
+- -f  --filepath:      The directory path of the CIFAR-10 or ImageNet dataset.
+- -s  --scorefn:       The selected of the four score functions to use. Options: (maxp, difference, entropy, oracle).
+- -p  --postcheck:     Enable post-check. Default is false.
+- -m  --memory:        Enable memory component. Default is None. Options: (dhash, invariants).
+- -d  --duplicates:    Set the percentage of the original training set for duplication. Default is 0 (No duplicates). Range (0-1].
+- -r  --rotations:     Set the percentage of the duplicated samples to apply random rotations or flips if a --duplicates value is given. Default is 0. Range (0-1].
+- -e  --end:           What to do when finished. Options: {alarm, shutdown}. Default is shutdown.
+```
 
 ### Examples of use
 
@@ -31,11 +33,13 @@ The script file `threshold.py` will calculate the optimal threshold hyperparamet
 
 To run it use the command `python3 threshold.py` plus some additional parameters as described bellow:
 
-- -m1 --model1: The first CNN model to use.
-- -m2 --model2: The second CNN model to use.
-- -f --filepath: The directory path of the CIFAR-10 or ImageNet dataset to use.
-- -t --train: Only applicable for the CIFAR-10 dataset. Wether to use the training or test dataset.
-- -n --n_threshold_values: The number of threshold values between 0 and 1 to check. The greater the number the longer the process. Default is 2000.
+```
+- -m1 --model1:             The first CNN model to use.
+- -m2 --model2:             The second CNN model to use.
+- -f  --filepath:           The directory path of the CIFAR-10 or ImageNet dataset to use.
+- -t  --train:              Only applicable for the CIFAR-10 dataset. Wether to use the training or test dataset.
+- -n  --n_threshold_values: The number of threshold values between 0 and 1 to check. The greater the number the longer the process. Default is 2000.
+```
 
 ### Examples of use
 
@@ -53,9 +57,11 @@ The script file `heterogeneity.py` will calculate the optimal threshold hyperpar
 
 To run it use the command `python3 heterogeneity.py` plus some additional parameters as described bellow:
 
-- -d --dataset: Which dataset models to use. Options: {cifar10, imagenet}.
-- -f --filepath: The directory path of the CIFAR-10 or ImageNet dataset to use.
-- -t --train: Only applicable to the CIFAR-10 dataset. Define whether to use the training or test dataset.
+```
+- -d  --dataset:     Which dataset models to use. Options: {cifar10, imagenet}.
+- -f  --filepath:    The directory path of the CIFAR-10 or ImageNet dataset to use.
+- -t  --train:       Only applicable to the CIFAR-10 dataset. Define whether to use the training or test dataset.
+```
 
 ### Examples of use
 ```console
