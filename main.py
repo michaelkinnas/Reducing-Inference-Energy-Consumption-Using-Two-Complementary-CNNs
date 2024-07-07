@@ -6,8 +6,10 @@ from argparse import ArgumentParser
 from torch import cuda
 from os import system
 from playsound import playsound
-from utils.workload_fns import write_results
+# from utils.workload_fns import write_results
 from utils.models_lists import cifar10_models
+from pandas import DataFrame
+from sklearn.metrics import classification_report
 
 
 def main():
@@ -22,7 +24,7 @@ def main():
     parser.add_argument("-m", "--memory", help="Enable memory component. Default is None.", choices=['dhash', 'invariants'], default=None)
     parser.add_argument("-d", "--duplicates", help="Set the percentage of the original training set for duplication. Default is 0 (No duplicates). Range (0-1]", type=float, default=0)
     parser.add_argument("-r", "--rotations", help="Set the percentage of the duplicated samples to apply random rotations or flips if a --duplicates value is given. Default is 0. Range (0-1]", type=float, default=0)
-    parser.add_argument("-e", "--end", help="What to do when finished. Default is shutdown.", choices=['shutdown', 'alarm'], default="shutdown")
+    parser.add_argument("-e", "--end", help="What to do when finished. Default is shutdown.", choices=['shutdown', 'alarm'], default="alarm")
 
     args = parser.parse_args()
 
@@ -36,6 +38,8 @@ def main():
         from torch import hub
         from utils.datasets import CIFAR10C
         from torchvision.transforms import Compose, ToTensor, Normalize
+
+        dataset = "CIFAR-10"
 
         transform = Compose([
                 ToTensor(),
@@ -64,6 +68,8 @@ def main():
         from torchvision.transforms import Compose, ToTensor, Normalize
         from utils.models_lists import imagenet_models
 
+        dataset = "ImageNet"
+
         transform = Compose([
             ToTensor(),
             Normalize(mean =(0.485, 0.456, 0.406), std = (0.229, 0.224, 0.225)), #ImageNet
@@ -86,15 +92,20 @@ def main():
 
 
     print("\n-------------Set parameters------------")
-    # print(f"Dataset: {args.dataset}")
+
+    print(f"Dataset: {dataset}")
 
     if args.model2:
-        print(f"Models: {args.model1}, {args.model2} on {device}")
+        print(f"First Model: {args.model1}")
+        print(f"Second Model: {args.model2}")
     else:
-        print(f'Model: {args.model1} on {device}')
+        print(f'Model: {args.model1}')
+
+    print(f"Device: {device}")
 
     if args.threshold and args.scorefn:
-        print(f"Using {args.scorefn} score function with {args.threshold} threshold value.")
+        print(f"Score function: {args.scorefn}")
+        print(f"Threshold parameter: {args.threshold}")
 
     if args.postcheck:
         print("Post-check enabled")
@@ -104,33 +115,41 @@ def main():
 
     if args.duplicates:
         print(f"Using {args.duplicates * 100:.2f}% duplicated samples for a total of {len(valset)} samples.")
+    
+    print("---------------------------------------")
 
     
 
     if not args.model2:
         from utils.workload_fns import single
-        response_times, correct = single(model_a, valset=valset, device=device)
+        response_times, trues, preds = single(model_a, valset=valset, device=device)
     else:
         if args.scorefn == 'oracle':
             from utils.workload_fns import double_oracle
-            response_times, correct = double_oracle(model_a, model_b, valset=valset, device=device)
+            response_times, trues, preds = double_oracle(model_a, model_b, valset=valset, device=device)
         else:
             if not args.postcheck:
                 from utils.workload_fns import double
-                response_times, correct = double(model_a=model_a, model_b=model_b, valset=valset, threshold=args.threshold, score_function=args.scorefn, device=device)
+                response_times, trues, preds = double(model_a=model_a, model_b=model_b, valset=valset, threshold=args.threshold, score_function=args.scorefn, device=device)
             else:
                 if not args.memory:
                     from utils.workload_fns import double_ps
-                    response_times, correct = double_ps(model_a=model_a, model_b=model_b, valset=valset, threshold=args.threshold, score_function=args.scorefn, device=device)
+                    response_times, trues, preds = double_ps(model_a=model_a, model_b=model_b, valset=valset, threshold=args.threshold, score_function=args.scorefn, device=device)
                 else:
                     from utils.workload_fns import double_ps_mem
-                    response_times, correct = double_ps_mem(model_a=model_a, model_b=model_b, valset=valset, threshold=args.threshold, score_function=args.scorefn, memory=args.memory, device=device)
+                    response_times, trues, preds = double_ps_mem(model_a=model_a, model_b=model_b, valset=valset, threshold=args.threshold, score_function=args.scorefn, memory=args.memory, device=device)
         
-    write_results(args, response_times=response_times, correct=correct)
-    print(f"Accuracy: {correct/len(valset) * 100:.2f}")
+    
+    print("\n---Classification report---")
+    print(classification_report(trues, preds, output_dict=False, zero_division=0, digits=4))
+    df = DataFrame(response_times)
+    df.drop(index=df.index[0:25], axis=0, inplace=True)
+    print("\n---Response times---")
+    print(f"Mean: {df['response_time'].mean() * 1000:.3f} ms")
+    print(f"95th: {df['response_time'].quantile(0.95) * 1000:.3f} ms")
+    print(f"99th: {df['response_time'].quantile(0.99) * 1000:.3f} ms")
 
     if args.end == 'shutdown':
-
         system('sudo shutdown now')
     elif args.end == 'alarm':
         playsound('./alarm.wav')

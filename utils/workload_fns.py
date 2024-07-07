@@ -1,15 +1,15 @@
 from torch import inference_mode, argmax
 from utils.monitor import ResourceMonitor
 from tqdm.auto import tqdm
-from pandas import DataFrame
-from datetime import datetime
-from .models_lists import cifar10_models
-from sklearn.metrics import classification_report
-
+# from pandas import DataFrame
+# from datetime import datetime
+# from .models_lists import cifar10_models
 
 def single(model, valset, device):
     response_times = []
-    correct = 0
+    preds = []
+    trues = []
+    # correct = 0
     monitor = ResourceMonitor()
 
     from torch import softmax
@@ -35,15 +35,18 @@ def single(model, valset, device):
                 'response_time': monitor.get_last_responce_time()
             })    
 
-            correct += pred_label == y.item()
+            # correct += pred_label == y.item()
+            preds.append(pred_label)
+            trues.append(y.item())            
 
-    
-    return response_times, correct
+    return response_times, trues, preds
+
 
 
 def double(model_a, model_b, valset, threshold, score_function, device):
     response_times = []
-    correct = 0
+    preds = []
+    trues = []
     monitor = ResourceMonitor()
 
     # Define score function
@@ -86,7 +89,9 @@ def double(model_a, model_b, valset, threshold, score_function, device):
                     'response_time': monitor.get_last_responce_time()
                 })
 
-                correct += pred_label == y.item()
+                preds.append(pred_label)
+                trues.append(y.item())
+
     else:
         with inference_mode():
             for _, (X, y) in tqdm(enumerate(valset), total=len(valset)):
@@ -113,13 +118,15 @@ def double(model_a, model_b, valset, threshold, score_function, device):
                     'response_time': monitor.get_last_responce_time()
                 })
 
-                correct += pred_label == y.item()
+                preds.append(pred_label)
+                trues.append(y.item())
     
-    return response_times, correct
+    return response_times, trues, preds
 
 def double_ps(model_a, model_b, valset, threshold, score_function, device):
     response_times = []
-    correct = 0
+    preds = []
+    trues = []
     monitor = ResourceMonitor()
 
     # Define score function
@@ -166,7 +173,8 @@ def double_ps(model_a, model_b, valset, threshold, score_function, device):
                     'response_time': monitor.get_last_responce_time()
                 })
 
-                correct += pred_label == y.item()
+                preds.append(pred_label)
+                trues.append(y.item())
     else:
         with inference_mode():
             for _, (X, y) in tqdm(enumerate(valset), total=len(valset)):
@@ -197,15 +205,17 @@ def double_ps(model_a, model_b, valset, threshold, score_function, device):
                     'timestamp': monitor.get_last_timestamp(),
                     'response_time': monitor.get_last_responce_time()
                 })
-
-                correct += pred_label == y.item()
+            
+                preds.append(pred_label)
+                trues.append(y.item())
     
-    return response_times, correct
+    return response_times, trues, preds
 
 
 def double_ps_mem(model_a, model_b, valset, threshold, score_function, device, memory):
     response_times = []
-    correct = 0
+    preds = []
+    trues = []
     monitor = ResourceMonitor()
     img_hash_lib = {}
 
@@ -271,7 +281,9 @@ def double_ps_mem(model_a, model_b, valset, threshold, score_function, device, m
                     'response_time': monitor.get_last_responce_time()
                 })
 
-                correct += pred_label == y.item()
+                preds.append(pred_label)
+                trues.append(y.item())
+
     else:
         with inference_mode():
             for _, (X, y, z) in tqdm(enumerate(valset), total=len(valset)):
@@ -313,15 +325,18 @@ def double_ps_mem(model_a, model_b, valset, threshold, score_function, device, m
                     'response_time': monitor.get_last_responce_time()
                 })
 
-                correct += pred_label == y.item()
-    
-    return response_times, correct
+                preds.append(pred_label)
+                trues.append(y.item())
+
+
+    return response_times, trues, preds
 
 
 
 def double_oracle(model_a, model_b, valset, device):
     response_times = []
-    correct = 0
+    preds = []
+    trues = []
     monitor = ResourceMonitor()
 
     from torch import softmax
@@ -352,46 +367,48 @@ def double_oracle(model_a, model_b, valset, device):
                 'response_time': monitor.get_last_responce_time()
             })
 
-            correct += pred_label == y.item()
+            preds.append(pred_label)
+            trues.append(y.item())
 
-    return response_times, correct
+    return response_times, trues, preds
 
 
-def write_results(args, response_times, correct):
-    print('Saving report to csv...')
-    df = DataFrame(response_times)
 
-    datestamp = datetime.now().isoformat()[:19]
+# def write_results(args, response_times, correct):
+#     print('Saving report to csv...')
+#     df = DataFrame(response_times)
 
-    dataset = 'C' if args.model1 in cifar10_models else 'I'
-    model_a = "["+args.model1+"]"
-    model_b = "["+args.model2+"]" if args.model2 else "[X]"
+#     datestamp = datetime.now().isoformat()[:19]
+
+#     dataset = 'C' if args.model1 in cifar10_models else 'I'
+#     model_a = "["+args.model1+"]"
+#     model_b = "["+args.model2+"]" if args.model2 else "[X]"
    
-    if args.scorefn:
-        if args.scorefn == 'maxp':
-            score_fn = "P"
-        elif args.scorefn == 'difference':
-            score_fn = "D"
-        elif args.scorefn == 'entropy':
-            score_fn = "E"
-        else:
-            score_fn = "O"
-    else:
-        score_fn = "X"
+#     if args.scorefn:
+#         if args.scorefn == 'maxp':
+#             score_fn = "P"
+#         elif args.scorefn == 'difference':
+#             score_fn = "D"
+#         elif args.scorefn == 'entropy':
+#             score_fn = "E"
+#         else:
+#             score_fn = "O"
+#     else:
+#         score_fn = "X"
 
-    thresh = str(args.threshold) if args.threshold else "X"
+#     thresh = str(args.threshold) if args.threshold else "X"
 
-    postcheck = "P" if args.postcheck else "X"
+#     postcheck = "P" if args.postcheck else "X"
 
-    if args.memory == 'dhash':
-        memory_comp = 'D'
-    elif args.memory == 'invariants':
-        memory_comp = "I"
-    else:
-        memory_comp = "X"
+#     if args.memory == 'dhash':
+#         memory_comp = 'D'
+#     elif args.memory == 'invariants':
+#         memory_comp = "I"
+#     else:
+#         memory_comp = "X"
 
-    duplicates = str(args.duplicates)
-    accuracy = "A" + str(correct / len(df))
+#     duplicates = str(args.duplicates)
+#     accuracy = "A" + str(correct / len(df))
 
 
-    df.to_csv(datestamp + dataset + model_a + model_b + score_fn + thresh + postcheck + memory_comp + duplicates + accuracy + ".csv", index=False)
+#     df.to_csv(datestamp + dataset + model_a + model_b + score_fn + thresh + postcheck + memory_comp + duplicates + accuracy + ".csv", index=False)
