@@ -1,12 +1,7 @@
-'''
-Main inference workload script
-v1.3.1
-'''
 from argparse import ArgumentParser 
 from torch import cuda
 from os import system
 from playsound import playsound
-# from utils.workload_fns import write_results
 from utils.models_lists import cifar10_models
 from pandas import DataFrame
 from sklearn.metrics import classification_report
