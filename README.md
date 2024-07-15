@@ -70,7 +70,6 @@ python3 heterogeneity.py -d cifar10 -f "../data/cifar-10-batches-py"
 
 ### ImageNet
 
-- convnext_small
 - convnext_tiny
 - densenet121
 - densenet161
@@ -78,11 +77,8 @@ python3 heterogeneity.py -d cifar10 -f "../data/cifar-10-batches-py"
 - densenet201
 - googlenet
 - inception_v3
-- mnasnet0_5
-- mnasnet0_75
 - mnasnet1_0
 - mnasnet1_3
-- mobilenet_v3_small
 - mobilenet_v3_large
 - regnet_x_16gf
 - regnet_x_1_6gf
@@ -97,15 +93,9 @@ python3 heterogeneity.py -d cifar10 -f "../data/cifar-10-batches-py"
 - regnet_y_8gf
 - resnext50_32x4d
 - resnet101
-- resnet18
 - resnet34
 - resnet50
-- shufflenet_v2_x0_5
-- shufflenet_v2_x1_0
-- shufflenet_v2_x1_5
 - shufflenet_v2_x2_0
-- squeezenet1_0
-- squeezenet1_1
 - swin_s
 - swin_t
 - swin_v2_s
