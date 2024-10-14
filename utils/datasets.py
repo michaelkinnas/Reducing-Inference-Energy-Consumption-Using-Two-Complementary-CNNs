@@ -8,6 +8,7 @@ from os import walk, path
 from PIL import Image
 
 
+
 class CIFAR10C(Dataset):
     def __init__(self, root: str, transform: Optional[Callable]=None, train=False, return_numpy=False, duplicate_ratio=0.0, transform_prob=0.0, random_seed=None):
         self.images = []        
@@ -30,7 +31,7 @@ class CIFAR10C(Dataset):
             batches = ("test_batch",)
 
         for batch in batches:
-            with open(root+"/"+batch, 'rb') as fo:
+            with open(path.join(root, batch), 'rb') as fo:
                 images_dict = pload(fo, encoding='bytes')
                 for img, label in zip(images_dict[b'data'], images_dict[b'labels']):
                     self.images.append((self.__CIFAR_to_numpy(img), array(label))) # shape HxWxC
@@ -92,7 +93,9 @@ class CIFAR10C(Dataset):
 
 # Use subset
 class ImageNetC(Dataset):
-    def __init__(self, root: str, transform: Optional[Callable]=None, return_numpy=False, duplicate_ratio=0.0, transform_prob=0.0, random_seed=None):
+    def __init__(self, root: str, transform: Optional[Callable]=None, return_numpy=False, 
+                 duplicate_ratio=0.0, transform_prob=0.0, random_seed=None):
+        
         self.images = []        
         self.transform = transform
         self.return_numpy = return_numpy
@@ -100,6 +103,8 @@ class ImageNetC(Dataset):
 
         if not path.exists(root):
             raise FileNotFoundError("The provided file path directory does not exist")
+        
+        #TODO: Test for existing dir but not valid location of imagenet images               
 
         for i, (fpath, dirs, files) in enumerate(sorted(walk(root))):
             if len(files) == 0:

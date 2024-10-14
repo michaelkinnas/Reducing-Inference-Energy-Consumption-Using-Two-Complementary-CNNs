@@ -48,6 +48,7 @@ def double(model_a, model_b, valset, threshold, score_function, device):
     preds = []
     trues = []
     monitor = ResourceMonitor()
+    second_model_usage= 0
 
     # Define score function
     if score_function == 'maxp':
@@ -76,6 +77,7 @@ def double(model_a, model_b, valset, threshold, score_function, device):
                 score = score_fn(logits)
 
                 if score < threshold:
+                    second_model_usage += 1
                     logits = model_b(X)
                     # probs = softmax(logits, dim=1)
 
@@ -104,8 +106,9 @@ def double(model_a, model_b, valset, threshold, score_function, device):
 
                 score = score_fn(logits)
 
-                if score > threshold:
+                if score > threshold:                    
                     logits = model_b(X)
+                    second_model_usage += 1
                     # probs = softmax(logits, dim=1)
 
                 pred_label = argmax(logits).item()
@@ -121,13 +124,15 @@ def double(model_a, model_b, valset, threshold, score_function, device):
                 preds.append(pred_label)
                 trues.append(y.item())
     
-    return response_times, trues, preds
+    return response_times, trues, preds, second_model_usage / len(valset)
 
 def double_ps(model_a, model_b, valset, threshold, score_function, device):
     response_times = []
     preds = []
     trues = []
     monitor = ResourceMonitor()
+    second_model_usage = 0
+    
 
     # Define score function
     if score_function == 'maxp':
@@ -156,6 +161,7 @@ def double_ps(model_a, model_b, valset, threshold, score_function, device):
 
                 if score_a < threshold:
                     logits_b = model_b(X)
+                    second_model_usage += 1
                     score_b = score_fn(logits_b)
 
                     if score_b > score_a:
@@ -189,6 +195,7 @@ def double_ps(model_a, model_b, valset, threshold, score_function, device):
 
                 if score_a > threshold:
                     logits_b = model_b(X)
+                    second_model_usage += 1
                     score_b = score_fn(logits_b)
 
                     if score_b < score_a:
@@ -209,7 +216,7 @@ def double_ps(model_a, model_b, valset, threshold, score_function, device):
                 preds.append(pred_label)
                 trues.append(y.item())
     
-    return response_times, trues, preds
+    return response_times, trues, preds, second_model_usage / len(valset)
 
 
 def double_ps_mem(model_a, model_b, valset, threshold, score_function, device, memory):
@@ -218,6 +225,7 @@ def double_ps_mem(model_a, model_b, valset, threshold, score_function, device, m
     trues = []
     monitor = ResourceMonitor()
     img_hash_lib = {}
+    second_model_usage = 0
 
     # Define score function
     if score_function == 'maxp':
@@ -261,6 +269,7 @@ def double_ps_mem(model_a, model_b, valset, threshold, score_function, device, m
 
                     if score_a < threshold:
                         logits_b = model_b(X)
+                        second_model_usage += 1
                         score_b = score_fn(logits_b)
 
                         if score_b > score_a:
@@ -305,6 +314,7 @@ def double_ps_mem(model_a, model_b, valset, threshold, score_function, device, m
 
                     if score_a > threshold:
                         logits_b = model_b(X)
+                        second_model_usage += 1
                         score_b = score_fn(logits_b)
 
                         if score_b < score_a:
@@ -329,15 +339,17 @@ def double_ps_mem(model_a, model_b, valset, threshold, score_function, device, m
                 trues.append(y.item())
 
 
-    return response_times, trues, preds
+    return response_times, trues, preds, second_model_usage / len(valset)
 
 
 
 def double_oracle(model_a, model_b, valset, device):
+    print("Double oracle")
     response_times = []
     preds = []
     trues = []
     monitor = ResourceMonitor()
+    second_model_usage = 0
 
     from torch import softmax
 
@@ -356,6 +368,7 @@ def double_oracle(model_a, model_b, valset, device):
 
             if pred_label != y.item():
                 logits_b = model_b(X)
+                second_model_usage += 1
                 probs_b = softmax(logits_b, dim=1)
                 pred_label = argmax(probs_b).item()
 
@@ -370,7 +383,7 @@ def double_oracle(model_a, model_b, valset, device):
             preds.append(pred_label)
             trues.append(y.item())
 
-    return response_times, trues, preds
+    return response_times, trues, preds, second_model_usage / len(valset)
 
 
 
