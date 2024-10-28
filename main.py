@@ -3,7 +3,6 @@ from argparse import ArgumentParser
 from torch import cuda, load
 from torch.nn import Module
 from os import system
-# from playsound import playsound
 from utils.models_lists import cifar10_models
 from pandas import DataFrame
 
@@ -142,22 +141,22 @@ def main():
     
 
     if not args.model_2:
-        from utils.workload_fns import single
+        from Deliverable.utils.workloadfunctions import single
         response_times, trues, preds = single(model_a, valset=valset, device=device)
     else:
         if args.scorefn == 'oracle':
-            from utils.workload_fns import double_oracle
+            from Deliverable.utils.workloadfunctions import double_oracle
             response_times, trues, preds = double_oracle(model_a, model_b, valset=valset, device=device)
         else:
             if not args.postcheck:
-                from utils.workload_fns import double
+                from Deliverable.utils.workloadfunctions import double
                 response_times, trues, preds = double(model_a=model_a, model_b=model_b, valset=valset, threshold=args.threshold, score_function=args.scorefn, device=device)
             else:
                 if not args.memory:
-                    from utils.workload_fns import double_ps
+                    from Deliverable.utils.workloadfunctions import double_ps
                     response_times, trues, preds = double_ps(model_a=model_a, model_b=model_b, valset=valset, threshold=args.threshold, score_function=args.scorefn, device=device)
                 else:
-                    from utils.workload_fns import double_ps_mem
+                    from Deliverable.utils.workloadfunctions import double_ps_mem
                     response_times, trues, preds = double_ps_mem(model_a=model_a, model_b=model_b, valset=valset, threshold=args.threshold, score_function=args.scorefn, memory=args.memory, device=device)
         
     

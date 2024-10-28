@@ -1,6 +1,6 @@
 import pandas as pd
 from torch.utils import data
-from utils.datasets import ImageNetC, CIFAR10C
+from utils.datasets import ImageNet, CIFAR10
 from utils.models_lists import imagenet_models, cifar10_models
 from torch import cuda, hub, inference_mode, argmax
 from torchvision.transforms import Compose, ToTensor, Normalize
@@ -32,7 +32,7 @@ def main():
 
         model_list = cifar10_models
 
-        dataset = CIFAR10C(root=args.filepath, train=args.train, transform=transform, random_seed=42)
+        dataset = CIFAR10(root=args.filepath, train=args.train, transform=transform, random_seed=42)
         
         BATCH_SIZE=64
 
@@ -46,7 +46,7 @@ def main():
 
         model_list = imagenet_models
 
-        dataset = ImageNetC(root=args.filepath, transform=transform, random_seed=42)
+        dataset = ImageNet(root=args.filepath, transform=transform, random_seed=42)
 
         BATCH_SIZE=64
 

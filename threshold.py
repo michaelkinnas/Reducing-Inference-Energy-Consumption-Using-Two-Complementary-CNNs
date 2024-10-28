@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from torch.utils import data
-from utils.score_fns import max_probability, difference, entropy
+from Deliverable.utils.scorefunctions import max_probability, difference, entropy
 from utils.datasets import ImageNetC, CIFAR10C
 from utils.models_lists import imagenet_models, cifar10_models
 from utils.heuristics import heuristic_search_process

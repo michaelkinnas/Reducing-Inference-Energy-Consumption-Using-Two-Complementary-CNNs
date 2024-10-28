@@ -1,8 +1,6 @@
-# import psutil
 from psutil import cpu_percent, virtual_memory
 from time import time
 from csv import writer
-
 
 class ResourceMonitor:
     def __init__(self):
@@ -26,7 +24,6 @@ class ResourceMonitor:
             'timestamp': []
         }
 
-        self.__recording = False
 
     def record_cpu_util(self):
         self.__cpu_util['util'].append(cpu_percent(percpu=True))
@@ -70,13 +67,11 @@ class ResourceMonitor:
 
         return self.__cpu_util['util'][-1]
     
-    
     def get_last_timestamp(self):
         if len(self.__cpu_util['util']) == 0:
             raise IndexError('CPU Utilization list is empty. "record_cpu_util()" must be called at least once.')
 
         return self.__cpu_util['timestamp'][-1]
-    
     
     def get_last_responce_time(self):
         if len(self.__cpu_util['timestamp']) < 2:

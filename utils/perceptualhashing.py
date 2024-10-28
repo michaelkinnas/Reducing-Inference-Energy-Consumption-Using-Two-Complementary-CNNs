@@ -3,10 +3,7 @@ from numpy import asmatrix, zeros, shape, linspace, array, power, round, append,
 from math import pi
 from scipy.special import comb
 from math import modf
-
-
-
-
+from cv2 import cvtColor, COLOR_RGB2GRAY, resize
 
 
 # Needs single channel image (grayscale) 
@@ -134,3 +131,10 @@ def complex_invariants_hash_string(image):
 def complex_invariants_hash_addition_float(image):
     invariants = calculate_complex_invariants(image)
     return invariants[0] + invariants[1] + invariants[3] + invariants[4]
+
+
+def dhash(image, hash_size = 8):
+    image = cvtColor(image, COLOR_RGB2GRAY)
+    resized = resize(image, (hash_size + 1, hash_size))
+    diff = resized[:, 1:] > resized[:, :-1]
+    return sum([2 ** i for (i, v) in enumerate(diff.flatten()) if v])

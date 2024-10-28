@@ -2,6 +2,7 @@ from torch import softmax
 from torch import max as tmax
 from math import log
 
+
 def max_probability(logits):
     probs = softmax(logits, dim=1)
     max_prob = tmax(probs).item()

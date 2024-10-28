@@ -1,18 +1,22 @@
 ---
+dataset: fashion_mnist              #Options cifar10, imagenet, intel, fashion_mnist
 first_model:
-  name: mnasnet1_3
-  weights_file:              #Optional. Use your own pth file or leave epty to use pretrained weights form PyTorch.
+  name: repvgg_a2
+  # weights_file: "/media/mike/EXT4-480GB/Model_weights/intel/intel_repvgg_a0.pth"             #Optional. Use your own pth file or leave epty to use pretrained weights form PyTorch.
+  # weights_file: "/home/mike/Research/Reducing Inference Energy Using Dual Complementary CNNs/distilled_models/intel_shufflenetv2_x1_5.pth"
+  weights_file:
 second_model:
-  enable: true
-  name: densenet121
-  weights_file:              #Optional. Use your own pth file or leave epty to use pretrained weights form PyTorch.
-  score_fn: entropy             #Options: [maxp, difference, entropy, oracle]
-  threshold: 0.7798
+  enable: false
+  name: resnet44
+  # weights_file: "/media/mike/EXT4-480GB/Model_weights/intel/intel_resnet44.pth"                #Optional. Use your own pth file or leave epty to use pretrained weights form PyTorch.
+  weights_file:
+  score_fn: difference             #Options: [maxp, difference, entropy, oracle]
+  threshold: 0.2166
   postcheck: true
 memory:
   enable: false
-  method: dhash              #Options: [dhash, invariants]
+  method: invariants              #Options: [dhash, invariants]
   duplicates: 0
   transforms: 0
-dataset_path: "/media/mike/EXT4-480GB/Datasets/ImageNet-Custom/val_resized_10K/"
+dataset_path: "/media/mike/EXT4-480GB/Datasets/"
 root_password:                #Optional
