@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from torch.utils import data
 from Deliverable.utils.scorefunctions import max_probability, difference, entropy
-from utils.datasets import ImageNetC, CIFAR10C
+from utils.datasets import ImageNet, CIFAR10, INTEL, FashionMNIST
 from utils.models_lists import imagenet_models, cifar10_models
 from utils.heuristics import heuristic_search_process
 from torch import cuda, hub, inference_mode, argmax, tensor
@@ -53,7 +53,7 @@ def main():
         model_a.eval()
         model_b.eval()
 
-        dataset = CIFAR10C(root=args.filepath, train=args.train, transform=transform, random_seed=42)
+        dataset = CIFAR10(root=args.filepath, train=args.train, transform=transform, random_seed=42)
 
         BATCH_SIZE=64
 
@@ -77,7 +77,7 @@ def main():
         model_a.eval()
         model_b.eval()
 
-        dataset = ImageNetC(root=args.filepath, transform=transform, random_seed=42)
+        dataset = ImageNet(root=args.filepath, transform=transform, random_seed=42)
 
         BATCH_SIZE=64
 

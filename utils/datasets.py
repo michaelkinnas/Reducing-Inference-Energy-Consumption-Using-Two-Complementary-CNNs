@@ -20,6 +20,8 @@ class INTEL(Dataset):
         self.data = []
         self.targets = []
 
+        self.dataset_size = len(self.data)
+
         self.labels = {
             'buildings' : 0,
             'forest': 1, 
@@ -55,20 +57,17 @@ class INTEL(Dataset):
 
 
     def __len__(self):
-        return len(self.images)
+        return len(self.data)
 
     def __getitem__(self, index):      
-        img_numpy, target = self.images[index][0], self.images[index][1]
+        img_numpy, target = self.data[index], self.targets[index]
 
         # Apply rotations to duplicated samples
-        if index > 3000 and self.rotations == True:
-            transpose_choice = self.random.choice([ROTATE_90_COUNTERCLOCKWISE, 
-                                        ROTATE_90_CLOCKWISE, 
-                                        ROTATE_180,
+        if self.rotations and index > self.dataset_size:
+            img_numpy = self.random.choice([rotate(img_numpy, ROTATE_90_COUNTERCLOCKWISE), 
+                                        rotate(img_numpy, ROTATE_90_CLOCKWISE), 
+                                        rotate(img_numpy, ROTATE_180),
                                         flip(img_numpy, 0)])
-            
-            img_numpy = rotate(img_numpy, transpose_choice)
-
 
         img_pil = Image.fromarray(img_numpy)
 
@@ -78,7 +77,7 @@ class INTEL(Dataset):
         if self.target_transform is not None:
             target = self.target_transform(target)
 
-        if self.return_numpy is True:
+        if self.return_numpy:
             return img_pil, target, img_numpy
         return img_pil, target
 
@@ -90,6 +89,7 @@ class CIFAR10(CIFAR10):
         self.random = Random(seed)
         self.rotations = rotations
         self.return_numpy = return_numpy
+        self.dataset_size = len(self.data)
             
         if duplicate_ratio > 0:
 
@@ -130,7 +130,7 @@ class CIFAR10(CIFAR10):
         img_numpy, target = self.data[index], self.targets[index]
 
         # Apply rotations to duplicated samples
-        if index > 10000 and self.rotations == True:
+        if self.rotations and index > self.dataset_size:
             img_numpy = self.random.choice([rotate(img_numpy, ROTATE_90_COUNTERCLOCKWISE), 
                                         rotate(img_numpy, ROTATE_90_CLOCKWISE), 
                                         rotate(img_numpy, ROTATE_180),
@@ -158,6 +158,7 @@ class FashionMNIST(FashionMNIST):
         self.random = Random(seed)
         self.rotations = rotations
         self.return_numpy = return_numpy
+        self.dataset_size = len(self.data)
 
         if duplicate_ratio > 0:
 
@@ -189,14 +190,15 @@ class FashionMNIST(FashionMNIST):
         img_numpy, target = self.data[index], self.targets[index]
 
         # Apply rotations to duplicated samples
-        if index > 10000 and self.rotations == True:
+        if self.rotations and index > self.dataset_size:
             img_numpy = self.random.choice([rotate(img_numpy, ROTATE_90_COUNTERCLOCKWISE), 
                                         rotate(img_numpy, ROTATE_90_CLOCKWISE), 
                                         rotate(img_numpy, ROTATE_180),
                                         flip(img_numpy, 0)])
+
             
         # img = Image.fromarray(img.numpy(), mode="L")
-        img_pil = Image.fromarray(img_numpy, mode="L")
+        img_pil = Image.fromarray(img_numpy.numpy(), mode="L")
         if self.transform is not None:
             img_pil = self.transform(img_pil)
         if self.target_transform is not None:
@@ -249,7 +251,7 @@ class ImageNet(ImageNet):
         path, target = self.samples[index]
         img_pil = self.loader(path)
 
-        if self.rotations == True and index > self.dataset_size:
+        if self.rotations and index > self.dataset_size:
             transpose_choice = self.random.choice([Image.FLIP_LEFT_RIGHT, 
                                                     Image.ROTATE_90, 
                                                     Image.ROTATE_180,

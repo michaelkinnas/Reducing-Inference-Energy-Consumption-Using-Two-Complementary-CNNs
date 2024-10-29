@@ -1,5 +1,5 @@
 ---
-dataset: fashion_mnist              #Options cifar10, imagenet, intel, fashion_mnist
+dataset: intel              #Options cifar10, imagenet, intel, fashionmnist
 first_model:
   name: repvgg_a2
   # weights_file: "/media/mike/EXT4-480GB/Model_weights/intel/intel_repvgg_a0.pth"             #Optional. Use your own pth file or leave epty to use pretrained weights form PyTorch.
@@ -10,13 +10,13 @@ second_model:
   name: resnet44
   # weights_file: "/media/mike/EXT4-480GB/Model_weights/intel/intel_resnet44.pth"                #Optional. Use your own pth file or leave epty to use pretrained weights form PyTorch.
   weights_file:
-  score_fn: difference             #Options: [maxp, difference, entropy, oracle]
+  scorefn: difference             #Options: [maxp, difference, entropy, oracle]
   threshold: 0.2166
   postcheck: true
 memory:
   enable: false
   method: invariants              #Options: [dhash, invariants]
-  duplicates: 0
-  transforms: 0
-dataset_path: "/media/mike/EXT4-480GB/Datasets/"
+duplicates: 0
+transforms: 0
+dataset_path: "/media/mike/EXT4-480GB/Datasets/INTEL/"
 root_password:                #Optional
