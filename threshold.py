@@ -1,14 +1,14 @@
-import pandas as pd
-import numpy as np
 from torch.utils import data
-from Deliverable.utils.scorefunctions import max_probability, difference, entropy
+from utils.scorefunctions import max_probability, difference, entropy
 from utils.datasets import ImageNet, CIFAR10, INTEL, FashionMNIST
 from utils.models_lists import imagenet_models, cifar10_models
-from utils.heuristics import heuristic_search_process
-from torch import cuda, hub, inference_mode, argmax, tensor
-from torchvision.transforms import Compose, ToTensor, Normalize
-from tqdm.auto import tqdm
+from utils.heuristics import threshold_search
+from torch import cuda, hub, inference_mode, argmax, tensor, load
+from torchvision.transforms import Compose, ToTensor, Normalize, Resize, Grayscale
 from torchvision.models import get_model
+from tqdm import tqdm
+import pandas as pd
+import numpy as np
 from argparse import ArgumentParser
 from multiprocessing.pool import Pool
 
@@ -21,20 +21,23 @@ score functions with and without the post-check mechanism, for max accuracy.
 def main():
     parser = ArgumentParser()
 
-    parser.add_argument("-m1", "--model1", help="The first model, required. This parameter will set which dataset to use (CIFAR10 or ImageNet)", required=True)   
-    parser.add_argument("-m2", "--model2", help="The second model, required. ", required=True)    
-    parser.add_argument("-f", "--filepath", help="The path of the correspondig CIFAR-10 or ImageNet validation dataset.", required=True)
+    parser.add_argument("-D", "--dataset", help="Define which dataset models to use.", choices=['cifar10', 'imagenet','intel', 'fashionmnist'], default='cifar-10', required=True)
+    parser.add_argument("-f", "--dataset-root", help="The root file path of the validation or test dataset. (e.g. For CIFAR-10 the directory containing the 'cifar-10-batches-py' folder, etc.)", required=True)
+    parser.add_argument("-m1", "--model1", help="The first model, required.", required=True)
+    parser.add_argument("-m2", "--model2", help="The second model, required.", required=True)    
     parser.add_argument("-t", "--train", help="Only valid for the CIFAR-10 dataset. Define wether to use the training or test dataset.", default=False, action="store_true")
     parser.add_argument("-n", "--n_threshold_values", help="Define the number of threshold values to check between 0 and 1. Higher numbers will be slower. Default is 2000", type=int, default=2000)
+    parser.add_argument("-w1", "--weights1", help="Optional. Directory of the '.pth' weights file for the first model.", default=None)
+    parser.add_argument("-w2", "--weights2", help="Optional. Directory of the '.pth' weights file for the second model.", default=None)
     
     args = parser.parse_args()
 
     device = 'cuda' if cuda.is_available() else 'cpu'
     if device == 'cuda':
-        cuda.empty_cache()    
+        cuda.empty_cache()
 
-    # Setup parameters
-    if args.model1 in cifar10_models:
+        # Setup parameters
+    if args.dataset == 'cifar10':
         n_classes = 10
 
         transform = Compose([
@@ -42,23 +45,15 @@ def main():
             Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.201)) # cifar10
         ])
 
-        DATASET = 'CIFAR10'
+        model_a = hub.load("chenyaofo/pytorch-cifar-models", model=f'cifar10_{args.model1}', pretrained=True).to(device)
+        model_b = hub.load("chenyaofo/pytorch-cifar-models", model=f'cifar10_{args.model2}', pretrained=True).to(device)
 
-        MODEL_A = args.model1
-        MODEL_B = args.model2
-    
-        model_a = hub.load("chenyaofo/pytorch-cifar-models", model=f'cifar10_{MODEL_A}', pretrained=True).to(device)
-        model_b = hub.load("chenyaofo/pytorch-cifar-models", model=f'cifar10_{MODEL_B}', pretrained=True).to(device)
-
-        model_a.eval()
-        model_b.eval()
-
-        dataset = CIFAR10(root=args.filepath, train=args.train, transform=transform, random_seed=42)
-
+        dataset = CIFAR10(root=args.dataset_root, train=args.train, transform=transform, seed=42)
+        
         BATCH_SIZE=64
 
         dataloader = data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)        
-    else:
+    elif args.dataset == 'imagenet':
         n_classes = 1000
 
         transform = Compose([
@@ -66,24 +61,66 @@ def main():
             Normalize(mean =(0.485, 0.456, 0.406), std = (0.229, 0.224, 0.225)) # imagenet
         ])
 
-        DATASET = 'ImageNet'
+        model_a = get_model(args.model1, weights=imagenet_models[args.model1]).to(device)
+        model_b = get_model(args.model2, weights=imagenet_models[args.model2]).to(device)
 
-        MODEL_A = args.model1
-        MODEL_B = args.model2
-
-        model_a = get_model(MODEL_A, weights=imagenet_models[MODEL_A]).to(device)
-        model_b = get_model(MODEL_B, weights=imagenet_models[MODEL_B]).to(device)
-
-        model_a.eval()
-        model_b.eval()
-
-        dataset = ImageNet(root=args.filepath, transform=transform, random_seed=42)
+        dataset = ImageNet(root=args.dataset_root, transform=transform, seed=42)
 
         BATCH_SIZE=64
 
         dataloader = data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
+
+
+    elif args.dataset == 'intel':
+        n_classes = 10
+
+        transform = Compose([
+            Resize((32,32)),
+            ToTensor(),    
+            Normalize((0.4302, 0.4575, 0.4539), (0.2386, 0.2377, 0.2733))
+        ])
+
+        model_a = hub.load("chenyaofo/pytorch-cifar-models", model=f'cifar10_{args.model1}', pretrained=True).to(device)
+        model_b = hub.load("chenyaofo/pytorch-cifar-models", model=f'cifar10_{args.model2}', pretrained=True).to(device)
+
+        split = "test" if args.train == True else "train"
+
+        dataset = INTEL(root=args.dataset_root, split=split, transform=transform, seed=42)
+
+        BATCH_SIZE=64
+
+        dataloader = data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)  
+
+
+    elif args.dataset == 'fashionmnist':
+        n_classes = 10
+
+        transform = Compose([  
+            Resize((32,32)),
+            Grayscale(num_output_channels=3),
+            ToTensor(),    
+            Normalize((0.2856, 0.2856, 0.2856), (0.3385, 0.3385, 0.3385))
+        ])
+
+        model_a = hub.load("chenyaofo/pytorch-cifar-models", model=f'cifar10_{args.model1}', pretrained=True).to(device)
+        model_b = hub.load("chenyaofo/pytorch-cifar-models", model=f'cifar10_{args.model2}', pretrained=True).to(device)
+
+        dataset = FashionMNIST(root=args.dataset_root, split=split, transform=transform, seed=42)
+
+        BATCH_SIZE=64
+
+        dataloader = data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2, train=args.train)
         
     entropy_norm_factor = entropy(tensor([1/n_classes for _ in range(n_classes)]).unsqueeze(dim=0))
+
+    if args.dataset in ['cifar10', 'intel', 'fashionmnist']:
+        if args.weights1 is not None:
+            model_a = load(f'{args.weights1}', map_location="cpu", weights_only=False).to(device)
+        if args.weights2 is not None:
+            model_b = load(f'{args.weights2}', map_location="cpu", weights_only=False).to(device)
+
+    model_a.eval()
+    model_b.eval()
 
     # Run inference on validation dataset for both models
     report = []
@@ -135,19 +172,19 @@ def main():
     # Multi processing    
     with Pool(n_threads) as pool:
         print("\nSearching parameter with max probability, please wait...")
-        for ret in pool.starmap(heuristic_search_process, maxp_splits):
+        for ret in pool.starmap(threshold_search, maxp_splits):
             maxp_results += ret[0]
             maxp_ps_results += ret[1]
 
     with Pool(n_threads) as pool:
         print("Searching parameter with difference, please wait......")
-        for ret in pool.starmap(heuristic_search_process, diff_splits):
+        for ret in pool.starmap(threshold_search, diff_splits):
             diff_results += ret[0]
             diff_ps_results += ret[1]
     
     with Pool(n_threads) as pool:
         print("Searching parameter with entropy, please wait......")
-        for ret in pool.starmap(heuristic_search_process, entropy_splits):
+        for ret in pool.starmap(threshold_search, entropy_splits):
             entropy_results += ret[0]
             entropy_ps_results += ret[1]
    

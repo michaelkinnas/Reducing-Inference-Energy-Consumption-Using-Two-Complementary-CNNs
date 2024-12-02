@@ -1,11 +1,9 @@
-from tqdm import tqdm
-
-def heuristic_search(trues, preds_a, preds_b, preds_score_a, preds_score_b, param_range, reverse, results, key_1, key_2):
+## the accuracy needs to be calculated on split length not whole dataset length
+def threshold_search(trues, preds_a, preds_b, preds_score_a, preds_score_b, param_range, reverse):
     acc = []
     acc_ps = []
-    # threshold_params = np.linspace(0.0001, 1, 1000)
     if not reverse:
-        for threshold in tqdm(param_range, total=len(param_range)):            
+        for threshold in param_range:            
             max_p_correct = 0
             max_p_correct_ps = 0
             max_p_model_b_usage = 0
@@ -21,7 +19,7 @@ def heuristic_search(trues, preds_a, preds_b, preds_score_a, preds_score_b, para
                     else:
                         max_p_correct_ps += pred_a == true
 
-            # print( max_p_correct / len(trues) * 100)
+            # print('a', max_p_correct)
             acc.append({
                 'threshold' : threshold,
                 'accuracy' : max_p_correct,
@@ -34,7 +32,7 @@ def heuristic_search(trues, preds_a, preds_b, preds_score_a, preds_score_b, para
                 'model_b_usage': max_p_model_b_usage,
             })
     else:
-        for threshold in tqdm(param_range, total=len(param_range)):
+        for threshold in param_range:
             max_p_correct = 0
             max_p_correct_ps = 0
             max_p_model_b_usage = 0
@@ -61,6 +59,4 @@ def heuristic_search(trues, preds_a, preds_b, preds_score_a, preds_score_b, para
                 'accuracy' : max_p_correct_ps,
                 'model_b_usage': max_p_model_b_usage,
             })
-
-    results[key_1] = acc
-    results[key_2] = acc_ps
+    return (acc, acc_ps)

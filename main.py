@@ -14,14 +14,13 @@ def main():
     deciding_args, _ = deciding_args_parser.parse_known_args()
 
     parser = ArgumentParser(parents=[deciding_args_parser])
-    # parser.add_argument("-y", "--yml-file", help="Use .yml configuration file instead of cli arguments. In this case you must provide the location of the .yml file and the rest of the arguments are ignored.", required=False, default=None)
     parser.add_argument("-D", "--dataset", help="The dataset to use.", choices=['cifar10', 'imagenet', 'intel', 'fashionmnist'], required=deciding_args.yml_file is None, default=None)
     parser.add_argument("-m1", "--model-1", help="The first model name, required. It must be included in the provided lists of available models.", required=deciding_args.yml_file is None)   
     parser.add_argument("-m2", "--model-2", help="The second model. It must be included in the provided lists of available models.", default=None, required=False)
     parser.add_argument("-w1", "--weights-1", help="Optional. A file path to the first model's weights file.", default=None, required=False)
     parser.add_argument("-w2", "--weights-2", help="Optional. A file path to the second model's weights file.", default=None, required=False)
-    parser.add_argument("-f", "--dataset-path", help="The file path of the validation or test dataset.", required=deciding_args.yml_file is None)
-    parser.add_argument("-s", "--scorefn", help="Score function to use.", choices=['maxp', 'difference', 'entropy', 'oracle'], default=None, required=False)
+    parser.add_argument("-f", "--dataset-root", help="The root file path of the validation or test dataset. (e.g. For CIFAR-10 the directory containing the 'cifar-10-batches-py' folder, etc.)", required=deciding_args.yml_file is None)
+    parser.add_argument("-s", "--scorefn", help="Score function to use.", choices=['maxp', 'difference', 'entropy', 'truth'], default=None, required=False)
     parser.add_argument("-t", "--threshold", help="The threshold value to use for the threshold check. (λ parameter)", type=float, required=False)
     parser.add_argument("-p", "--postcheck", help="Enable post check. Default is false.", default=False, action="store_true")
     parser.add_argument("-m", "--memory", help="Enable memory component. Default is None.", choices=['dhash', 'invariants'], default=None)
@@ -68,7 +67,6 @@ def main():
         ROTATIONS = config['transforms']
         ROOT_PASSWORD = config['root_password']
 
-    print(DATASET)
     device = 'cuda' if cuda.is_available() else 'cpu'
 
     if MODEL_2 and not SCORE_FN and THRESHOLD == None:
@@ -253,7 +251,7 @@ def main():
         from utils.workloadfunctions import single
         response_times, trues, preds = single(model_a, valset=valset, device=device)
     else:
-        if SCORE_FN == 'oracle':
+        if SCORE_FN == 'truth':
             from utils.workloadfunctions import double_oracle
             response_times, trues, preds, usage = double_oracle(model_a, model_b, valset=valset, device=device)
         else:
