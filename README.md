@@ -93,7 +93,7 @@ python3 threshold.py --model1 resnet20 --model2 mobilenetv2_x0_5 --filepath "<pa
 
 The script file `complementarity.py` will calculate the optimal threshold hyperparameter for a given CNN pair. 
 
-To run it use the command `python3 heterogeneity.py` plus some additional parameters as described bellow:
+To run it use the command `python3 complementarity.py` plus some additional parameters as described bellow:
 
 ```
   -h, --help            show this help message and exit
@@ -110,6 +110,8 @@ To run it use the command `python3 heterogeneity.py` plus some additional parame
                         (e.g. 'resnet20.pth'). If not set the default pretrained CIFAR-10 model weights will be
                         used.
 ```
+
+The results are saved in a `complementarity.csv` file in the same directory that you run the script.
 
 ### Examples of use
 ```console

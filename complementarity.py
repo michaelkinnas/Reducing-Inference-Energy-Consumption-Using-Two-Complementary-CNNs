@@ -31,7 +31,7 @@ def main():
 
         model_list = cifar10_models
 
-        dataset = CIFAR10(root=args.dataset_root, train=args.train, transform=transform, random_seed=42)
+        dataset = CIFAR10(root=args.dataset_root, train=args.train, transform=transform, seed=42)
         
         BATCH_SIZE=64
 
@@ -46,7 +46,7 @@ def main():
 
         model_list = imagenet_models
 
-        dataset = ImageNet(root=args.dataset_root, transform=transform, random_seed=42)
+        dataset = ImageNet(root=args.dataset_root, transform=transform, seed=42)
 
         BATCH_SIZE=64
 
@@ -137,8 +137,6 @@ def main():
             complementarity_matrix.at[model1, model2] = volume / len(df)
 
     print("Saving results ...")
-    # plot_complementarity_matrix(complementarity_matrix)
-    # print(complementarity_matrix)
     complementarity_matrix.to_csv("./complementarity.csv", index=False, float_format='%.4f')
 
 if __name__ == '__main__':
