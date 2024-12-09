@@ -82,7 +82,7 @@ python3 complementarity.py -D cifar10 -f "<path to dataset root>"
 
 <!-- #### NOTICE: If using Intel of FashionMNIST datasets you must provide the directory that contain all the model weights for all corresponding CIFAR-10 models as shown bellow. The model weights must have the same name as the model, with the .pth extention. If not provided the default CIFAR-10 weights will be used. -->
 
-#### NOTICE: If using the Intel or FashionMNIST datasets you must provide the directory that contain all the .pth model weights for all corresponding CIFAR-10 models as shown bellow. (You can download the .tar.gz files containing the pretrained weights for Intel [here](https://drive.google.com/file/d/1ldod2qrkYISxyIBjA7Rl873aRgdGQnH2/view?usp=drive_link) and for FashionMNIST [here](https://drive.google.com/file/d/1C0cri5ek32RsIujW5GZoWxrcg1pgBWUc/view?usp=drive_link), and then unzip them in that directory), otherwise the default CIFAR-10 weights from PyTorch will be used.
+#### NOTICE: If using the Intel or FashionMNIST datasets you must provide the directory that contain all the .pth model weights for all corresponding CIFAR-10 models as shown bellow. (You can download the .tar.gz files containing the pretrained weights for Intel [here](https://drive.google.com/file/d/1C0cri5ek32RsIujW5GZoWxrcg1pgBWUc/view?usp=drive_link) and for FashionMNIST [here](https://drive.google.com/file/d/1ldod2qrkYISxyIBjA7Rl873aRgdGQnH2/view?usp=drive_link), and then unzip them in that directory), otherwise the default CIFAR-10 weights from PyTorch will be used.
 
 ## Script 2: Calculate thresold hyperparameter 'λ'.
 
@@ -117,7 +117,7 @@ To calculate the best threshold hyperparameter for the selected CNN pair, you ca
 python3 threshold.py --model1 resnet20 --model2 mobilenetv2_x0_5 --filepath "<path to dataset root>" -t
 ```
 
-#### NOTICE: If using Intel of FashionMNIST datasets you must provide the weights .pth file for each model that is trained on this dataset. By default the pretrained model weights are for the CIFAR-10 dataset. You can download the .tar.gz files containing all the pretrained weights for Intel [here](https://drive.google.com/file/d/1ldod2qrkYISxyIBjA7Rl873aRgdGQnH2/view?usp=drive_link) and for FashionMNIST [here](https://drive.google.com/file/d/1C0cri5ek32RsIujW5GZoWxrcg1pgBWUc/view?usp=drive_link). You can unzip the .tar.gz files and point to the corresponding CIFAR-10 model you are using.
+#### NOTICE: If using Intel of FashionMNIST datasets you must provide the weights .pth file for each model that is trained on this dataset. By default the pretrained model weights are for the CIFAR-10 dataset. You can download the .tar.gz files containing all the pretrained weights for Intel [here](https://drive.google.com/file/d/1C0cri5ek32RsIujW5GZoWxrcg1pgBWUc/view?usp=drive_link) and for FashionMNIST [here](https://drive.google.com/file/d/1ldod2qrkYISxyIBjA7Rl873aRgdGQnH2/view?usp=drive_link). You can unzip the .tar.gz files and point to the corresponding CIFAR-10 model you are using.
 
 
 ## Script 3: Main methodology implementation of two complementary CNNs
@@ -165,7 +165,7 @@ python3 main.py --model1 resnet20 --model2 mobilenetv2_x0_5 --filepath "<path to
 Instead of cli parameters you can use a configuration file. If you use the `-y` parameter you must provide the `*.yml` file to read from. An example yml configuration file is provided in this repo.
 
 
-#### NOTICE: If using Intel of FashionMNIST datasets you must provide the weights .pth file for each model that is trained on this dataset. By default the pretrained model weights are for the CIFAR-10 dataset. You can download the .tar.gz files containing all the pretrained weights for Intel [here](https://drive.google.com/file/d/1ldod2qrkYISxyIBjA7Rl873aRgdGQnH2/view?usp=drive_link) and for FashionMNIST [here](https://drive.google.com/file/d/1C0cri5ek32RsIujW5GZoWxrcg1pgBWUc/view?usp=drive_link). You can unzip the .tar.gz files and point to the corresponding CIFAR-10 model you are using.
+#### NOTICE: If using Intel of FashionMNIST datasets you must provide the weights .pth file for each model that is trained on this dataset. By default the pretrained model weights are for the CIFAR-10 dataset. You can download the .tar.gz files containing all the pretrained weights for Intel [here](https://drive.google.com/file/d/1C0cri5ek32RsIujW5GZoWxrcg1pgBWUc/view?usp=drive_link) and for FashionMNIST [here](https://drive.google.com/file/d/1ldod2qrkYISxyIBjA7Rl873aRgdGQnH2/view?usp=drive_link). You can unzip the .tar.gz files and point to the corresponding CIFAR-10 model you are using.
 
 ## Supported CNN models
 
