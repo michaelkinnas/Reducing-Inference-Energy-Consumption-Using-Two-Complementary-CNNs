@@ -1,26 +1,20 @@
-from torch.utils import data
-from utils.scorefunctions import max_probability, difference, entropy
-from utils.datasets import ImageNet, CIFAR10, INTEL, FashionMNIST
-from utils.models_lists import imagenet_models, cifar10_models
-from utils.heuristics import threshold_search
+from multiprocessing.pool import Pool
+from argparse import ArgumentParser
 from torch import cuda, hub, inference_mode, argmax, tensor, load
 from torchvision.transforms import Compose, ToTensor, Normalize, Resize, Grayscale
 from torchvision.models import get_model
+from torch.utils import data
+from utils.score_functions import max_probability, difference, entropy
+from utils.datasets import ImageNet, CIFAR10, INTEL, FashionMNIST
+from utils.meta import imagenet_models
+from utils.search import threshold_search
 from tqdm import tqdm
 import pandas as pd
 import numpy as np
-from argparse import ArgumentParser
-from multiprocessing.pool import Pool
 
-'''
-This script will run the hypermarameter search on the provided validation dataset
-and then calculate the optimal threshold hyperparamter for each combination of 
-score functions with and without the post-check mechanism, for max accuracy.
-'''
 
 def main():
     parser = ArgumentParser()
-
     parser.add_argument("-D", "--dataset", help="Define which dataset models to use.", choices=['cifar10', 'imagenet','intel', 'fashionmnist'], default='cifar-10', required=True)
     parser.add_argument("-f", "--dataset-root", help="The root file path of the validation or test dataset. (e.g. For CIFAR-10 the directory containing the 'cifar-10-batches-py' folder, etc.)", required=True)
     parser.add_argument("-m1", "--model1", help="The first model, required.", required=True)
@@ -28,15 +22,14 @@ def main():
     parser.add_argument("-t", "--train", help="Only valid for the CIFAR-10 dataset. Define wether to use the training or test dataset.", default=False, action="store_true")
     parser.add_argument("-n", "--n_threshold_values", help="Define the number of threshold values to check between 0 and 1. Higher numbers will be slower. Default is 2000", type=int, default=2000)
     parser.add_argument("-w1", "--weights1", help="Optional. Directory of the '.pth' weights file for the first model.", default=None)
-    parser.add_argument("-w2", "--weights2", help="Optional. Directory of the '.pth' weights file for the second model.", default=None)
-    
+    parser.add_argument("-w2", "--weights2", help="Optional. Directory of the '.pth' weights file for the second model.", default=None)    
     args = parser.parse_args()
 
     device = 'cuda' if cuda.is_available() else 'cpu'
     if device == 'cuda':
         cuda.empty_cache()
 
-        # Setup parameters
+    # Setup parameters
     if args.dataset == 'cifar10':
         n_classes = 10
 
@@ -122,7 +115,6 @@ def main():
     model_a.eval()
     model_b.eval()
 
-    # Run inference on validation dataset for both models
     report = []
     print("\nGetting predictions from selected models please wait...")
     with inference_mode():

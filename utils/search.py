@@ -1,4 +1,3 @@
-## the accuracy needs to be calculated on split length not whole dataset length
 def threshold_search(trues, preds_a, preds_b, preds_score_a, preds_score_b, param_range, reverse):
     acc = []
     acc_ps = []
@@ -18,8 +17,7 @@ def threshold_search(trues, preds_a, preds_b, preds_score_a, preds_score_b, para
                         max_p_correct_ps += pred_b == true
                     else:
                         max_p_correct_ps += pred_a == true
-
-            # print('a', max_p_correct)
+                        
             acc.append({
                 'threshold' : threshold,
                 'accuracy' : max_p_correct,

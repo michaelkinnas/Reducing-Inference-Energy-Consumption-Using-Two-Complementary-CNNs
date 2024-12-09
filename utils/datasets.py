@@ -1,6 +1,6 @@
+from os import walk, path
 from typing import Any, Tuple
 from random import Random
-from os import walk, path
 from torch.utils.data import Dataset
 from torchvision.datasets import FashionMNIST, ImageNet, CIFAR10
 from cv2 import rotate, flip, ROTATE_90_CLOCKWISE, ROTATE_180, ROTATE_90_COUNTERCLOCKWISE

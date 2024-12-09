@@ -1,13 +1,124 @@
 # Reducing inference energy consumption using dual complementary CNNs
 
-This repository is part of the "Reducing inference energy consumption using dual complementary CNNs", paper published at FGCS journal. You can read it [here](https://doi.org/10.1016/j.future.2024.107606).
+This repository contains the PyTorch implementation of the paper "Reducing inference energy consumption using dual complementary CNNs", published in the FGCS journal. You can read it [here](https://doi.org/10.1016/j.future.2024.107606).
 
-It contains three main scripts that run the experiments as described in the paper.
+It contains three scripts that run the experiments as described in the paper, and are explained bellow.
 
-## Script 1: Main methodology implementation of two complementary CNNs
+## Prerequisites
 
-The file `main.py` will run the main inference workload of the proposed methodology.
-To run it you can type `python3 main.py` plus additional parameters as described bellow. A list of supported CNN models is written at the end of the readme.
+- Python 3
+- Pytorch >= 2.1.0
+- Torchvision >= 0.16.0
+
+## Preparation
+
+To start with the experiments you begin by cloning the repository:
+
+```bash
+git clone https://github.com/michaelkinnas/Reducing-Inference-Energy-Consumption-Using-Two-Complementary-CNNs
+cd Reducing-Inference-Energy-Consumption-Using-Two-Complementary-CNNs
+```
+
+To install the depedencies run:
+
+```bash
+pip install -r requirements.txt
+```
+
+It is recommended to use a python virtual environment:
+
+- with python venv:
+
+```bash
+python -m venv <path-to-environment>/<environment-name>
+source  <path-to-environment>/<environment-name>/bin/activate
+pip install -r requirements.txt
+```
+
+- with conda:
+
+```bash
+conda create --name <environment-name> --file requirements.txt
+```
+
+## Recommended pipeline
+
+The pipeline as described in the paper has three main steps:
+
+1. Calculate complementarity matrix from given pretrained CNN models and select two CNN models.
+2. Calculate λ hyperparamter value for selected CNN pair.
+3. Run the inference methodology on test dataset with the selected CNN pair and calculated λ parameter.
+
+## Script 1: Calculate complementarity matrix.
+
+The script file `complementarity.py` will calculate a complementarity matrix for a given pretrained CNN model pool.
+
+To run it use the command `python3 complementarity.py` plus some additional parameters as described bellow:
+
+```
+  -h, --help            show this help message and exit
+  -D, --dataset {cifar10,imagenet,intel,fashionmnist}
+                        Define which dataset models to use.
+  -f, --dataset-root DATASET_ROOT
+                        The root file path of the validation or test dataset. (e.g. For CIFAR-10 the directory
+                        containing the 'cifar-10-batches-py' folder, etc.)
+  -t, --train           Define whether to use the training or test split, for datasets that require that
+                        parameter.
+  -w, --weights WEIGHTS
+                        Optional. The path directory of custom weights for all the models used in the process.
+                        The files should be in '.pth' extension and named after the original CIFAR-10 model name
+                        (e.g. 'resnet20.pth'). If not set the default pretrained CIFAR-10 model weights will be
+                        used.
+```
+
+The results are saved in a `complementarity.csv` file in the same directory that you run the script.
+
+### Examples of use
+```console
+python3 complementarity.py -D cifar10 -f "<path to dataset root>"
+```
+
+<!-- #### NOTICE: If using Intel of FashionMNIST datasets you must provide the directory that contain all the model weights for all corresponding CIFAR-10 models as shown bellow. The model weights must have the same name as the model, with the .pth extention. If not provided the default CIFAR-10 weights will be used. -->
+
+#### NOTICE: If using Intel of FashionMNIST datasets you must provide the directory that contain all the model weights for all corresponding CIFAR-10 models as shown bellow. You can donwload the pretrained weights for Intel and FashionMNIST by running the XXX script: 
+
+## Script 2: Calculate thresold hyperparameter 'λ'.
+
+The script file `threshold.py` will calculate the optimal threshold hyperparameter for a given CNN pair. 
+
+To run it use the command `python3 threshold.py` plus some additional parameters as described bellow:
+
+```
+  -h, --help            show this help message and exit
+  -D, --dataset {cifar10,imagenet,intel,fashionmnist}
+                        Define which dataset models to use.
+  -f, --dataset-root DATASET_ROOT
+                        The root file path of the validation or test dataset. (e.g. For CIFAR-10 the directory
+                        containing the 'cifar-10-batches-py' folder, etc.)
+  -m1, --model1 MODEL1  The first model, required.
+  -m2, --model2 MODEL2  The second model, required.
+  -t, --train           Only valid for the CIFAR-10 dataset. Define wether to use the training or test dataset.
+  -n, --n_threshold_values N_THRESHOLD_VALUES
+                        Define the number of threshold values to check between 0 and 1. Higher numbers will be
+                        slower. Default is 2000
+  -w1, --weights1 WEIGHTS1
+                        Optional. Directory of the '.pth' weights file for the first model.
+  -w2, --weights2 WEIGHTS2
+                        Optional. Directory of the '.pth' weights file for the second model.
+```
+
+### Examples of use
+
+To calculate the best threshold hyperparameter for the selected CNN pair, you can type:
+
+```console
+python3 threshold.py --model1 resnet20 --model2 mobilenetv2_x0_5 --filepath "<path to dataset root>" -t
+```
+
+#### NOTE: If using Intel of FashionMNIST datasets you must provide the weights .pth file for each model that is trained on this dataset. By default the pretrained model weights are for the CIFAR-10 dataset.
+
+
+## Script 3: Main methodology implementation of two complementary CNNs
 
 ```
   -h, --help            show this help message and exit
@@ -51,77 +162,32 @@ python3 main.py --model1 resnet20 --model2 mobilenetv2_x0_5 --filepath "<path to
 
 Instead of cli parameters you can use a configuration file. If you use the `-y` parameter you must provide the `*.yml` file to read from. An example yml configuration file is provided in this repo.
 
-#### NOTE: If using Intel of FashionMNIST datasets you must provide the weights .pth file for each model that is trained on this dataset. By default the pretrained model weights are for the CIFAR-10 dataset.
-
-## Script 2: Search thresold hyperparameter 'λ'.
-
-The script file `threshold.py` will calculate the optimal threshold hyperparameter for a given CNN pair. 
-
-To run it use the command `python3 threshold.py` plus some additional parameters as described bellow:
-
-```
-  -h, --help            show this help message and exit
-  -D, --dataset {cifar10,imagenet,intel,fashionmnist}
-                        Define which dataset models to use.
-  -f, --dataset-root DATASET_ROOT
-                        The root file path of the validation or test dataset. (e.g. For CIFAR-10 the directory
-                        containing the 'cifar-10-batches-py' folder, etc.)
-  -m1, --model1 MODEL1  The first model, required.
-  -m2, --model2 MODEL2  The second model, required.
-  -t, --train           Only valid for the CIFAR-10 dataset. Define wether to use the training or test dataset.
-  -n, --n_threshold_values N_THRESHOLD_VALUES
-                        Define the number of threshold values to check between 0 and 1. Higher numbers will be
-                        slower. Default is 2000
-  -w1, --weights1 WEIGHTS1
-                        Optional. Directory of the '.pth' weights file for the first model.
-  -w2, --weights2 WEIGHTS2
-                        Optional. Directory of the '.pth' weights file for the second model.
-```
-
-### Examples of use
-
-To calculate the best threshold hyperparameter for the selected CNN pair, you can type:
-
-```console
-python3 threshold.py --model1 resnet20 --model2 mobilenetv2_x0_5 --filepath "<path to dataset root>" -t
-```
 
 #### NOTE: If using Intel of FashionMNIST datasets you must provide the weights .pth file for each model that is trained on this dataset. By default the pretrained model weights are for the CIFAR-10 dataset.
-
-
-## Script 3: Calculate complementarity matrix.
-
-The script file `complementarity.py` will calculate the optimal threshold hyperparameter for a given CNN pair. 
-
-To run it use the command `python3 complementarity.py` plus some additional parameters as described bellow:
-
-```
-  -h, --help            show this help message and exit
-  -D, --dataset {cifar10,imagenet,intel,fashionmnist}
-                        Define which dataset models to use.
-  -f, --dataset-root DATASET_ROOT
-                        The root file path of the validation or test dataset. (e.g. For CIFAR-10 the directory
-                        containing the 'cifar-10-batches-py' folder, etc.)
-  -t, --train           Define whether to use the training or test split, for datasets that require that
-                        parameter.
-  -w, --weights WEIGHTS
-                        Optional. The path directory of custom weights for all the models used in the process.
-                        The files should be in '.pth' extension and named after the original CIFAR-10 model name
-                        (e.g. 'resnet20.pth'). If not set the default pretrained CIFAR-10 model weights will be
-                        used.
-```
-
-The results are saved in a `complementarity.csv` file in the same directory that you run the script.
-
-### Examples of use
-```console
-python3 complementarity.py -D cifar10 -f "<path to dataset root>"
-```
-
-#### NOTE: If using Intel of FashionMNIST datasets you must provide the directory that contain all the model weights for all corresponding CIFAR-10 models as shown bellow. The model weights must have the same name as the model, with the .pth extention. If not provided the default CIFAR-10 weights will be used.
-
 
 ## Supported CNN models
+
+### CIFAR-10
+
+- mobilenetv2_x0_5
+- mobilenetv2_x0_75
+- mobilenetv2_x1_0
+- mobilenetv2_x1_4
+- repvgg_a0
+- repvgg_a1
+- repvgg_a2
+- resnet20
+- resnet32
+- resnet44
+- resnet56
+- shufflenetv2_x0_5
+- shufflenetv2_x1_0
+- shufflenetv2_x1_5
+- shufflenetv2_x2_0
+- vgg11_bn
+- vgg13_bn
+- vgg16_bn
+- vgg19_bn
 
 ### ImageNet
 
@@ -156,26 +222,6 @@ python3 complementarity.py -D cifar10 -f "<path to dataset root>"
 - swin_v2_s
 - swin_v2_t
 
-### CIFAR-10
+## License
 
-- mobilenetv2_x0_5
-- mobilenetv2_x0_75
-- mobilenetv2_x1_0
-- mobilenetv2_x1_4
-- repvgg_a0
-- repvgg_a1
-- repvgg_a2
-- resnet20
-- resnet32
-- resnet44
-- resnet56
-- shufflenetv2_x0_5
-- shufflenetv2_x1_0
-- shufflenetv2_x1_5
-- shufflenetv2_x2_0
-- vgg11_bn
-- vgg13_bn
-- vgg16_bn
-- vgg19_bn
-
-
+This project is licensed under the Apache License 2.0. You can red the [LICENSE](https://github.com/michaelkinnas/Reducing-Inference-Energy-Consumption-Using-Two-Complementary-CNNs/blob/main/LICENSE) file for more details.

@@ -1,12 +1,13 @@
-import pandas as pd
-from torch.utils import data
-from utils.datasets import ImageNet, CIFAR10, INTEL, FashionMNIST
-from utils.models_lists import imagenet_models, cifar10_models
+from argparse import ArgumentParser
 from torch import cuda, hub, inference_mode, argmax, load
 from torchvision.transforms import Compose, ToTensor, Normalize, Resize, Grayscale
 from torchvision.models import get_model
-from argparse import ArgumentParser
+from torch.utils import data
+from utils.datasets import ImageNet, CIFAR10, INTEL, FashionMNIST
+from utils.meta import imagenet_models, cifar10_models
 from tqdm import tqdm
+import pandas as pd
+
 
 def main():
     parser = ArgumentParser()

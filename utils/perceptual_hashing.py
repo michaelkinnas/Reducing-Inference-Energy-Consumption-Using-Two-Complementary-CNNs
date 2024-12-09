@@ -3,10 +3,8 @@ from numpy import asmatrix, zeros, shape, linspace, array, power, round, append,
 from math import pi
 from scipy.special import comb
 from math import modf
-from cv2 import cvtColor, COLOR_RGB2GRAY, resize
 
 
-# Needs single channel image (grayscale) 
 def __calculateMoments(data_matrix, order):
     """
     It calculates geometric moments.
@@ -48,7 +46,6 @@ def __geometricMomentsToComplexMoments(gm, order):
     :param gm: geometric moments: numpy array
     :return: complex moments: numpy array
     """
-
     c = zeros((order + 1, order + 1)).astype(complex)
     for p in range(0, order + 1):
         for q in range(0, order - p + 1):

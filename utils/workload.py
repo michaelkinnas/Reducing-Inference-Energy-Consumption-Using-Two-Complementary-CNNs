@@ -2,6 +2,7 @@ from torch import inference_mode, argmax
 from utils.monitor import ResourceMonitor
 from tqdm.auto import tqdm
 
+
 def single(model, valset, device):
     response_times = []
     preds = []
@@ -51,13 +52,13 @@ def double(model_a, model_b, valset, threshold, score_function, device):
 
     # Define score function
     if score_function == 'maxp':
-        from utils.scorefunctions import max_probability
+        from utils.score_functions import max_probability
         score_fn = max_probability
     elif score_function == 'difference':
-        from utils.scorefunctions import difference
+        from utils.score_functions import difference
         score_fn = difference
     elif score_function == 'entropy':
-        from utils.scorefunctions import entropy
+        from utils.score_functions import entropy
         score_fn = entropy
         
     input('RESET POWER METER AND PRESS ENTER...')
@@ -140,13 +141,13 @@ def double_ps(model_a, model_b, valset, threshold, score_function, device):
 
     # Define score function
     if score_function == 'maxp':
-        from utils.scorefunctions import max_probability
+        from utils.score_functions import max_probability
         score_fn = max_probability
     elif score_function == 'difference':
-        from utils.scorefunctions import difference
+        from utils.score_functions import difference
         score_fn = difference
     elif score_function == 'entropy':
-        from utils.scorefunctions import entropy
+        from utils.score_functions import entropy
         score_fn = entropy
 
     input('RESET POWER METER AND PRESS ENTER...')
@@ -240,21 +241,21 @@ def double_ps_mem(model_a, model_b, valset, threshold, score_function, device, m
 
     # Define score function
     if score_function == 'maxp':
-        from utils.scorefunctions import max_probability
+        from utils.score_functions import max_probability
         score_fn = max_probability
     elif score_function == 'difference':
-        from utils.scorefunctions import difference
+        from utils.score_functions import difference
         score_fn = difference
     elif score_function == 'entropy':
-        from utils.scorefunctions import entropy
+        from utils.score_functions import entropy
         score_fn = entropy
 
     if memory == 'invariants':
         # from utils.im_fingerprint import inv_hash
-        from utils.perceptualhashing import complex_invariants_hash_addition_float
+        from utils.perceptual_hashing import complex_invariants_hash_addition_float
         hash_fn = complex_invariants_hash_addition_float
     elif memory == 'dhash':
-        from utils.perceptualhashing import dhash
+        from utils.perceptual_hashing import dhash
         hash_fn = dhash
 
     input('RESET POWER METER AND PRESS ENTER...')

@@ -1,14 +1,14 @@
-from sklearn.metrics import classification_report
+from os import system
+from yaml import safe_load, YAMLError
+from argparse import ArgumentParser
 from torch import cuda, load
 from torch.nn import Module
-from os import system
+from utils.meta import cifar10_models, imagenet_models
+from sklearn.metrics import classification_report
 from pandas import DataFrame
-from yaml import safe_load, YAMLError
-from utils.models_lists import cifar10_models, imagenet_models
-from argparse import ArgumentParser
+
 
 def main():
-    #TODO required arguments when providing yml file should be ignored
     deciding_args_parser = ArgumentParser(add_help=False)
     deciding_args_parser.add_argument("-y", "--yml-file", help="Use .yml configuration file instead of cli arguments. In this case you must provide the location of the .yml file and the rest of the arguments are ignored.", type=str, required=False, default=None)
     deciding_args, _ = deciding_args_parser.parse_known_args()
@@ -248,22 +248,22 @@ def main():
     
 
     if not MODEL_2:
-        from utils.workloadfunctions import single
+        from utils.workload import single
         response_times, trues, preds = single(model_a, valset=valset, device=device)
     else:
         if SCORE_FN == 'truth':
-            from utils.workloadfunctions import double_oracle
+            from utils.workload import double_oracle
             response_times, trues, preds, usage = double_oracle(model_a, model_b, valset=valset, device=device)
         else:
             if not POSTCHECK:
-                from utils.workloadfunctions import double
+                from utils.workload import double
                 response_times, trues, preds, usage = double(model_a=model_a, model_b=model_b, valset=valset, threshold=THRESHOLD, score_function=SCORE_FN, device=device)
             else:
                 if not MEMORY:
-                    from utils.workloadfunctions import double_ps
+                    from utils.workload import double_ps
                     response_times, trues, preds, usage = double_ps(model_a=model_a, model_b=model_b, valset=valset, threshold=THRESHOLD, score_function=SCORE_FN, device=device)
                 else:
-                    from utils.workloadfunctions import double_ps_mem
+                    from utils.workload import double_ps_mem
                     response_times, trues, preds, usage = double_ps_mem(model_a=model_a, model_b=model_b, valset=valset, threshold=THRESHOLD, score_function=SCORE_FN, memory=MEMORY_METHOD, device=device)
         
     
