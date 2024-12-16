@@ -1,10 +1,10 @@
 # Reducing inference energy consumption using dual complementary CNNs
 
-This repository contains the PyTorch implementation of the paper "Reducing inference energy consumption using dual complementary CNNs", published in the FGCS journal. You can read it [here](https://doi.org/10.1016/j.future.2024.107606).
+This repository contains the PyTorch implementation of the paper [Reducing inference energy consumption using dual complementary CNNs](https://doi.org/10.1016/j.future.2024.107606), published in the Future Generations Computer System journal. It contains three Python scripts that run the experiments as described in the paper, and are explained bellow.
 
 <img src="https://github.com/michaelkinnas/Reducing-Inference-Energy-Consumption-Using-Two-Complementary-CNNs/blob/main/overview.png?raw=true" width="100%">
 
-It contains three scripts that run the experiments as described in the paper, and are explained bellow.
+
 
 ## Prerequisites
 
@@ -223,6 +223,10 @@ Instead of cli parameters you can use a configuration file. If you use the `-y` 
 - swin_t
 - swin_v2_s
 - swin_v2_t
+
+## Acknowledgements
+
+This work was funded by the European Union’s Horizon Europe research and innovation program under grant agreement No. 101120237 (ELIAS)
 
 ## License
 
